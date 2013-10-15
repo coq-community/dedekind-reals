@@ -39,6 +39,22 @@ Section Missing_Lemmas.
       assumption.
   Qed.
 
+  Lemma Qlt_minus_1 : forall q : Q, q + (-1#1) < q.
+  Proof.
+    intro q.
+    rewrite <- (Qplus_0_r q) at 2.
+    apply Qplus_lt_r.
+    compute; reflexivity.
+  Qed.
+
+  Lemma Qlt_plus_1 : forall q : Q, q < q + (1#1).
+  Proof.
+    intro q.
+    rewrite <- (Qplus_0_r q) at 1.
+    apply Qplus_lt_r.
+    compute; reflexivity.
+  Qed.
+
 End Missing_Lemmas.
 
 Structure R := {
@@ -49,9 +65,9 @@ Structure R := {
   lower_bound : {q : Q | lower q};
   upper_bound : {r : Q | upper r};
   lower_lower : forall q r, q < r -> lower r -> lower q;
-  lower_open : forall q, lower q -> {r | q < r /\ lower r};
+  lower_open : forall q, lower q -> exists r, q < r /\ lower r;
   upper_upper : forall q r, q < r -> upper q -> upper r;
-  upper_open : forall r, upper r -> {q | q < r /\ upper q};
+  upper_open : forall r, upper r -> exists q,  q < r /\ upper q;
   disjoint : forall q, ~ (lower q /\ upper q);
   located : forall q r, q < r -> {lower q} + {upper r}
 }.
@@ -83,14 +99,8 @@ Proof.
   refine {| lower := (fun q => (q < s)) ; upper := (fun r => (s < r)) |}.
   - intros ? ? E. rewrite E. tauto.
   - intros ? ? E. rewrite E. tauto.
-  - exists (s + (-1#1)).
-    rewrite <- (Qplus_0_r s) at 2.
-    apply Qplus_lt_r.
-    compute; auto.
-  - exists (s + 1).
-    rewrite <- (Qplus_0_r s) at 1.
-    apply Qplus_lt_r.
-    reflexivity.
+  - exists (s + (-1#1)); apply Qlt_minus_1.
+  - exists (s + 1). apply Qlt_plus_1.
   - intros. apply (Qlt_trans _ r); assumption.
   - intros q H.
     exists ((q + s) * (1#2)). split.
@@ -187,3 +197,96 @@ Proof.
   - apply G.
   - apply H.
 Qed.
+
+(* It would be extremely painful to define maps on R by hand all the time.
+   So instead we prove a lemma that will allow us to cover most cases. *)
+
+Section LipschitzFunctions.
+
+Definition is_lipschitz (f : Q -> Q) :=
+  { l : Q | forall q r : Q, q < r ->
+              l * (q - r) < f r - f q /\ f r - f q < l * (r - q) }.
+
+Definition extend (f : Q -> Q) : is_lipschitz f -> R -> R.
+Proof.
+  intros [l L] x.
+  refine {|
+    lower := fun q => exists d u, lower x d /\ upper x u /\ q + l * (u - d) < f d ;
+    upper := fun r => exists d u, lower x d /\ upper x u /\ f u < r + l * (d - u) 
+  |}.
+  - intros a b E. split.
+    + intros [d [u [H1 [H2 H3]]]].
+      exists d. exists u. rewrite <- E. auto.
+    + intros [d [u [H1 [H2 H3]]]].
+      exists d. exists u. rewrite E. auto.
+  - intros a b E. split.
+    + intros [d [u [H1 [H2 H3]]]].
+      exists d. exists u. rewrite <- E. auto.
+    + intros [d [u [H1 [H2 H3]]]].
+      exists d. exists u. rewrite E. auto.
+  - destruct (lower_bound x) as (dx, Ldx).
+    destruct (upper_bound x) as (ux, Udx).
+    exists (f dx - l * (ux - dx) - 1).
+    exists dx; exists ux.
+    split; [assumption | (split ; [assumption | idtac])].
+    ring_simplify.
+    apply Qlt_minus_1.
+  - destruct (lower_bound x) as (dx, Ldx).
+    destruct (upper_bound x) as (ux, Udx).
+    exists (f ux - l * (dx - ux) + 1).
+    exists dx; exists ux.
+    split; [assumption | (split ; [assumption | idtac])].
+    ring_simplify.
+    apply Qlt_plus_1.
+  - intros q r H [dx [ux [G1 [G2 G3]]]].
+    exists dx; exists ux.
+    split; [assumption | (split ; [assumption | idtac])].
+    transitivity (r + l * (ux - dx)).
+    + apply Qplus_lt_l; assumption.
+    + assumption.
+  - intros q [dx [ux [G1 [G2 G3]]]].
+    exists ((q + f dx - l * (ux - dx)) * (1#2)).
+    split.
+    + apply (Qmult_lt_r _ _ (2#1)); [(compute; auto) | idtac].
+      apply (Qplus_lt_r _ _ (-q + l * (ux - dx))).
+      ring_simplify.
+      ring_simplify in G3.
+      assumption.
+    + exists dx; exists ux.
+      split; [assumption | (split ; [assumption | idtac])].
+      apply (Qmult_lt_r _ _ (2#1)); [(compute; auto) | idtac].
+      apply (Qplus_lt_r _ _ (- f dx)).
+      ring_simplify.
+      setoid_replace (-2#2) with (-1#1); [idtac | reflexivity].
+      ring_simplify in G3.
+      assumption.
+  - intros q r H [dx [ux [G1 [G2 G3]]]].
+    exists dx; exists ux.
+    split; [assumption | (split ; [assumption | idtac])].
+    transitivity (q + l * (dx - ux)).
+    + assumption.
+    + apply Qplus_lt_l; assumption.
+  - intros q [dx [ux [G1 [G2 G3]]]].
+    exists ((q + f ux - l * (dx - ux)) * (1#2)).
+    split.
+    + apply (Qmult_lt_r _ _ (2#1)); [(compute; auto) | idtac].
+      apply (Qplus_lt_r _ _ (-q + l * (dx - ux))).
+      ring_simplify.
+      ring_simplify in G3.
+      assumption.
+    + exists dx; exists ux.
+      split; [assumption | (split ; [assumption | idtac])].
+      apply (Qmult_lt_r _ _ (2#1)); [(compute; auto) | idtac].
+      apply (Qplus_lt_r _ _ (- f ux)).
+      ring_simplify.
+      setoid_replace (-2#2) with (-1#1); [idtac | reflexivity].
+      ring_simplify in G3.
+      assumption.
+  - intros q [[dx [ux [H1 [H2 H3]]]] [ex' [vx' [G1 [G2 G3]]]]].
+    admit.
+  - intros q r H.
+    admit.
+Defined.
+      
+
+End LipschitzFunctions.
