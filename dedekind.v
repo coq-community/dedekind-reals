@@ -1,4 +1,4 @@
-(** An attempt to formalized Dedekind reals in Coq. *)
+(** An attempt to formalize Dedekind reals in Coq. *)
 
 Require Import QArith.
 Require Import QOrderedType.
@@ -12,6 +12,18 @@ Section Missing_Lemmas.
     unfold Qlt. simpl.
     rewrite !Z.mul_opp_l. omega.
   Defined.
+
+  Lemma Qplus_lt_lt_compat : forall (p q r s : Q), p < q -> r < s -> p + r < q + s.
+  Proof.
+    auto using Qlt_le_weak, Qplus_lt_le_compat.
+  Qed.
+
+  Lemma Qmult_lt_positive : forall (p q : Q), 0 < p -> 0 < q -> 0 < p * q.
+  Proof.
+    intros p q pPos qPos.
+    rewrite <- (Qmult_0_l q) at 1.
+    apply Qmult_lt_compat_r; assumption.
+  Qed.
 
   Lemma Qopp_lt_shift_l : forall (p q : Q), -p < q <-> -q < p.
   Proof.
@@ -92,6 +104,18 @@ Proof.
     + destruct (H1 q); destruct (G1 q); tauto.
     + destruct (H2 q); destruct (G2 q); tauto.
 Qed.
+
+Lemma lower_below_upper (x : R) (q r : Q) : lower x q -> upper x r -> q < r.
+Proof.
+  intros Lq Ur.
+  destruct (Q_dec q r) as [[E | E] | E].
+  - assumption.
+  - exfalso. apply (disjoint x r).
+    auto using (lower_lower x r q).
+  - exfalso. apply (disjoint x r).
+    split; [idtac | assumption].
+    rewrite <- E; assumption.
+Qed.    
 
 Definition Q_inject : Q -> R.
 Proof.
@@ -203,13 +227,25 @@ Qed.
 
 Section LipschitzFunctions.
 
-Definition is_lipschitz (f : Q -> Q) :=
-  { l : Q | forall q r : Q, q < r ->
-              l * (q - r) < f r - f q /\ f r - f q < l * (r - q) }.
+Definition is_lipschitz (f : Q -> Q) (l : Q) :=
+  forall q r : Q, q < r -> l * (q - r) < f r - f q /\ f r - f q < l * (r - q).
 
-Definition extend (f : Q -> Q) : is_lipschitz f -> R -> R.
+Lemma lipschitz_positive (f : Q -> Q) (l : Q) : is_lipschitz f l -> l > 0.
 Proof.
-  intros [l L] x.
+  intro H.
+  assert (G : 0 < 1) ; [(compute ; reflexivity) | idtac].
+  destruct (H (0#1) (1#1) G) as [K1 K2].
+  apply (Qmult_lt_r _ _ (2#1)); [(compute; reflexivity) | idtac].
+  apply (Qplus_lt_l _ _ (-l)).
+  ring_simplify.
+  transitivity (f 1%Q - f 0%Q).
+  - ring_simplify in K1; assumption.
+  - ring_simplify in K2; assumption.
+Qed.
+
+Definition extend (f : Q -> Q) (l : Q) : is_lipschitz f l -> R -> R.
+Proof.
+  intros L x.
   refine {|
     lower := fun q => exists d u, lower x d /\ upper x u /\ q + l * (u - d) < f d ;
     upper := fun r => exists d u, lower x d /\ upper x u /\ f u < r + l * (d - u) 
@@ -282,8 +318,20 @@ Proof.
       setoid_replace (-2#2) with (-1#1); [idtac | reflexivity].
       ring_simplify in G3.
       assumption.
-  - intros q [[dx [ux [H1 [H2 H3]]]] [ex' [vx' [G1 [G2 G3]]]]].
-    admit.
+  - intros q [[dx [ux [H1 [H2 H3]]]] [ex [vx [G1 [G2 G3]]]]].
+    absurd (ux < ex).
+    + auto using Qle_not_lt, Qlt_le_weak, (lower_below_upper x).
+    + apply (Qplus_lt_l _ _ (- ux)).
+      apply (Qmult_lt_r _ _ l); [exact (lipschitz_positive f l L) | idtac].
+      apply (Qplus_lt_l _ _ (l * (dx - vx))).
+      transitivity (f vx - f dx).
+      * destruct (L dx vx (lower_below_upper x dx vx H1 G2)) as [K _].
+        ring_simplify in K; ring_simplify; assumption.
+      * apply Qopp_lt_compat, (Qplus_lt_r _ _ (q + l * (ex - vx) + f vx)).
+        ring_simplify.
+        assert (J := Qplus_lt_lt_compat _ _ _ _ H3 G3).
+        ring_simplify in J.
+        assumption.
   - intros q r H.
     admit.
 Defined.
