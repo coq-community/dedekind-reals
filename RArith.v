@@ -1,3 +1,3 @@
 (** Arithmetic on real numbers. *)
 
-Require Import dedekind.
+Require Import Cut.
