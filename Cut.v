@@ -1,10 +1,8 @@
 (** The definition of Dedekind cuts. *)
 
-Require Import QArith.
-Require Import MiscLemmas.
-Require Import QOrderedType.
-
+Require Import QArith QOrderedType.
 Require Import Morphisms Setoid.
+Require Import MiscLemmas.
 
 (** A Dedekind cut is represented by the predicates [lower] and [upper]. *)
 Structure R := {
@@ -47,10 +45,10 @@ Delimit Scope R_scope with R.
 
 Instance Proper_Req : Equivalence Req.
 Proof.
-  unfold Req, Rle.
+  unfold Req.
   split.
-  - intros x; tauto.
-  - intros x y [H1 H2]; split; intro q.
+  - intros x ; tauto.
+  - intros x y [H1 H2] ; split ; intro q.
     + split; apply H1.
     + split; apply H2.
   - intros x y z [G1 G2] [H1 H2].
@@ -64,13 +62,13 @@ Qed.
 Lemma lower_below_upper (x : R) (q r : Q) : lower x q -> upper x r -> q < r.
 Proof.
   intros Lq Ur.
-  destruct (Q_dec q r) as [[E | E] | E].
+  destruct (Q_dec q r) as [[E1 | E2] | E3].
   - assumption.
   - exfalso. apply (disjoint x r).
     auto using (lower_lower x r q).
   - exfalso. apply (disjoint x r).
     split; [idtac | assumption].
-    rewrite <- E; assumption.
+    rewrite <- E3; assumption.
 Qed.
 
 Local Open Scope Q_scope.
@@ -82,9 +80,9 @@ Proof.
   refine {| lower := (fun q => (q < s)) ; upper := (fun r => (s < r)) |}.
   - intros ? ? E. rewrite E. tauto.
   - intros ? ? E. rewrite E. tauto.
-  - exists (s + (-1#1)); apply Qlt_minus_1.
-  - exists (s + 1). apply Qlt_plus_1.
-  - intros. apply (Qlt_trans _ r); assumption.
+  - exists (s + (-1#1)) ; apply Qlt_minus_1.
+  - exists (s + 1) ; apply Qlt_plus_1.
+  - intros q r ? ? ; apply (Qlt_trans _ r); assumption.
   - intros q H.
     exists ((q + s) * (1#2)). split.
     + apply (Qmult_lt_r _ _ (2#1)); [reflexivity | idtac].
@@ -124,7 +122,7 @@ Qed.
 
 Coercion Q_inject : Q >-> R.
 
-(** Definitionof common constants. *)
+(** Definition of common constants. *)
 Definition Rzero : R := Q_inject 0.
 Definition Zone : R := Q_inject 1.
 

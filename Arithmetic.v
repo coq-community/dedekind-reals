@@ -23,7 +23,7 @@ Admitted.
 
 (** Opposite value, we do this one by hand as an illustration.
     We should really define it as an extension of [Qopp]. *)
-Definition Ropp (x : R) : R.
+Definition Ropp : R -> R.
 Admitted.
 
 Definition Rminus x y := Rplus x (Ropp y).
