@@ -43,6 +43,8 @@ Infix "<" := Rlt : R_scope.
 Infix "==" := Req : R_scope.
 Infix "=/=" := Rneq (at level 70, no associativity) : R_scope.
 
+Delimit Scope R_scope with R.
+
 Instance Proper_Req : Equivalence Req.
 Proof.
   unfold Req, Rle.

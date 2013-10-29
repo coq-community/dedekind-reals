@@ -1,16 +1,22 @@
 (** Real arithmetic. *)
 
 Require Import MiscLemmas.
-Require Import QArith QOrderedType.
-Require Export Field.
+Require Import QArith QOrderedType Qminmax.
 Require Import Cut.
+Require Import Lipschitz.
 
 Local Open Scope Q_scope.
 
 (** Addition. *)
 Definition Rplus : R -> R -> R.
-Admitted.
-
+Proof.
+  apply (lipschitz_extend2 Qplus (fun _ _ _ _ => 1#1)).
+  intros a b a' b' q r q' r'.
+  split.
+  - admit.
+  - admit.
+Defined.
+    
 (** Multiplication. *)
 Definition Rmult : R -> R -> R.
 Admitted.
@@ -18,43 +24,7 @@ Admitted.
 (** Opposite value, we do this one by hand as an illustration.
     We should really define it as an extension of [Qopp]. *)
 Definition Ropp (x : R) : R.
-Proof.
-  refine {| lower := (fun q => upper x (-q)); upper := (fun r => lower x (-r)) |}.
-  - intros ? ? H. rewrite H; tauto.
-  - intros ? ? H. rewrite H; tauto.
-  - destruct (upper_bound x) as [r H].
-    exists (- r).
-    rewrite (Qopp_involutive r); assumption.
-  - destruct (lower_bound x) as [q H].
-    exists (- q).
-    rewrite (Qopp_involutive q); assumption.
-  - intros q r H G.
-    apply (upper_upper _ (- r) _); [idtac | assumption].
-    apply Qopp_lt_compat.
-    rewrite 2 Qopp_involutive; assumption.
-  - intros q H.
-    destruct (upper_open x (-q)) as [s [G1 G2]]; [assumption | idtac].
-    exists (-s); split.
-    apply Qopp_lt_shift_r; assumption.
-    rewrite Qopp_involutive; assumption.
-  - intros q r H G.
-    apply (lower_lower _ _ (- q)) ; [idtac | assumption].
-    apply Qopp_lt_compat.
-    rewrite 2 Qopp_involutive; assumption.
-  - intros q H.
-    destruct (lower_open x (-q)) as [s [G1 G2]]; [assumption | idtac].
-    exists (-s); split.
-    apply Qopp_lt_shift_l; assumption.
-    rewrite Qopp_involutive; assumption.
-  - intros q.
-    assert (H := disjoint x (- q)).
-    tauto.
-  - intros q r H.
-    destruct (located x (-r) (-q)).
-    + apply Qopp_lt_compat; rewrite 2 Qopp_involutive; assumption.
-    + right; assumption.
-    + left; assumption.
-Defined.
+Admitted.
 
 Definition Rminus x y := Rplus x (Ropp y).
 
@@ -74,12 +44,7 @@ Instance Rmult_comp : Proper (Req ==> Req ==> Req) Rmult.
 Admitted.
 
 Instance Ropp_comp : Proper (Req ==> Req) Ropp.
-Proof.
-  intros x y [H G].
-  split; intro q; simpl.
-  - admit.
-  - apply H.
-Qed.
+Admitted.
 
 Local Open Scope R_scope.
 
@@ -130,4 +95,3 @@ Admitted.
 
 Lemma Qmult_plus_distr_l (x y z : R) : (x + y) * z == (x * z) + (y * z).
 Admitted.
-

@@ -1,6 +1,6 @@
 (** Various lemmas that seem to be missing from the standard library. *)
 
-Require Import QArith.
+Require Import QArith Qminmax.
 
 Local Open Scope Q_scope.
 
@@ -9,6 +9,18 @@ Definition Qpositive := {q : Q & q > 0}.
 Definition Q_of_Qpositive (q : Qpositive) := projT1 q.
 
 Coercion Q_of_Qpositive : Qpositive >-> Q.
+
+Definition Qnonnegative := {q : Q & q >= 0}.
+
+Definition Q_of_Qnonnegative (q : Qnonnegative) := projT1 q.
+
+Coercion Q_of_Qnonnegative : Qnonnegative >-> Q.
+
+Definition Qinterval (q r : Q) := { s : Q | q <= s /\ s <= r }.
+
+Definition Q_of_Qinterval a b (s : Qinterval a b) := projT1 s.
+
+Coercion Q_of_Qinterval : Qinterval >-> Q.
 
 Lemma Qopp_lt_compat : forall (p q : Q), p < q <-> -q < -p.
 Proof.
