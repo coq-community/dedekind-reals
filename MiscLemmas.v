@@ -83,5 +83,27 @@ Proof.
   compute; reflexivity.
 Qed.
 
+Lemma Qplus_nonneg_cone : forall q r, 0 <= q -> 0 <= r -> 0 <= q + r.
+Proof.
+  intros q r G H.
+  setoid_replace 0 with (0 + 0) ; [idtac | (compute; reflexivity)].
+  apply Qplus_le_compat; assumption.
+Qed.
+
+Lemma Qplus_zero_nonneg : forall q r, 0 <= q -> 0 <= r -> q + r == 0 -> q == 0 /\ r == 0.
+Proof.
+  intros q r Pq Pr H.
+  split.
+  - apply Qle_antisym ; auto.
+    setoid_rewrite <- H.
+    setoid_replace q with (q + 0) at 1 ; [idtac | ring].
+    apply Qplus_le_r; assumption.
+  - apply Qle_antisym ; auto.
+    setoid_rewrite <- H.
+    setoid_replace r with (0 + r) at 1 ; [idtac | ring].
+    apply Qplus_le_l; assumption.
+Qed.
+
 Lemma Qpower_strictly_pos : forall p n, 0 < p -> 0 < p^n.
 Admitted.
+
