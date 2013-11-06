@@ -104,6 +104,23 @@ Proof.
     apply Qplus_le_l; assumption.
 Qed.
 
-Lemma Qpower_strictly_pos : forall p n, 0 < p -> 0 < p^n.
-Admitted.
+Require Import Qpower.
 
+Lemma Qpower_zero0: forall p, ~p==0 -> p^0 == 1.
+Proof.
+intros p H.
+compute ; auto.
+Qed.
+
+Lemma Qpower_strictly_pos : forall p n, 0 < p -> 0 < p^n.
+intros p n G.
+induction n.
+- rewrite (Qpower_zero0 p).
+compute; reflexivity.
+apply Qnot_eq_sym.
+apply Qlt_not_eq ; assumption.
+-rename p0 into r.
+induction r.
+compute.
+simpl.
+Admitted.
