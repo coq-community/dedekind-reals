@@ -112,15 +112,20 @@ intros p H.
 compute ; auto.
 Qed.
 
-Lemma Qpower_strictly_pos : forall p n, 0 < p -> 0 < p^n.
+Lemma Qpower_nonzero0 : forall p n, ~ p==0 -> ~ p^n==0.
+Proof.
 intros p n G.
 induction n.
 - rewrite (Qpower_zero0 p).
-compute; reflexivity.
-apply Qnot_eq_sym.
-apply Qlt_not_eq ; assumption.
--rename p0 into r.
-induction r.
-compute.
-simpl.
+apply Q_apart_0_1.
+assumption.
+-simpl.
+apply (Qpower_not_0_positive p p0 G).
+-simpl.
+Admitted.
+
+Lemma Qpower_strictly_pos : forall p n, 0 < p -> 0 < p^n.
+Proof.
+intros p n G.
+rewrite (Qlt_not_eq 0 p G).
 Admitted.
