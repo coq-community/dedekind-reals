@@ -106,26 +106,42 @@ Qed.
 
 Require Import Qpower.
 
-Lemma Qpower_zero0: forall p, ~p==0 -> p^0 == 1.
+Lemma Qpower_zero: forall p, ~p==0 -> p^0 == 1.
 Proof.
 intros p H.
 compute ; auto.
 Qed.
 
-Lemma Qpower_nonzero0 : forall p n, ~ p==0 -> ~ p^n==0.
+Lemma Qinv_nonzero : forall p, ~ p == 0 -> ~ (/ p == 0).
+Proof.
+  intros p H.
+  admit.
+Qed.
+
+Lemma Qpower_nonzero : forall p n, ~ p==0 -> ~ p^n==0.
 Proof.
 intros p n G.
 induction n.
-- rewrite (Qpower_zero0 p).
-apply Q_apart_0_1.
-assumption.
--simpl.
-apply (Qpower_not_0_positive p p0 G).
--simpl.
-Admitted.
+- rewrite (Qpower_zero p).
+  apply Q_apart_0_1.
+  assumption.
+- apply (Qpower_not_0_positive p p0 G).
+- apply Qinv_nonzero, (Qpower_not_0_positive p p0 G).
+Qed.
+
+Lemma lt_from_le_nonzero: forall p, 0 <= p -> ~ p == 0 -> 0 < p.
+Proof.
+  intros p H G.
+  destruct (Qlt_le_dec 0 p) as [K|L].
+  - assumption.
+  - absurd (p == 0) ; auto.
+    apply Qle_antisym ; assumption.
+Qed.
 
 Lemma Qpower_strictly_pos : forall p n, 0 < p -> 0 < p^n.
 Proof.
-intros p n G.
-rewrite (Qlt_not_eq 0 p G).
-Admitted.
+  intros p n G.
+  apply lt_from_le_nonzero.
+  - apply Qpower_pos, Qlt_le_weak; assumption.
+  - apply Qpower_nonzero, Qnot_eq_sym, Qlt_not_eq ; assumption.
+Qed.
