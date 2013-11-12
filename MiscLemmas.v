@@ -112,10 +112,30 @@ intros p H.
 compute ; auto.
 Qed.
 
+Lemma lt_from_le_nonzero: forall p, 0 <= p -> ~ p == 0 -> 0 < p.
+Proof.
+  intros p H G.
+  destruct (Qlt_le_dec 0 p) as [K|L].
+  - assumption.
+  - absurd (p == 0) ; auto.
+    apply Qle_antisym ; assumption.
+Qed.
+
 Lemma Qinv_nonzero : forall p, ~ p == 0 -> ~ (/ p == 0).
 Proof.
-  intros p H.
-  admit.
+intros p H.
+destruct (Q_dec 0 p) as [[A1|A2]|B].
+- assert (F:= Qinv_lt_0_compat p A1).
+apply Qnot_eq_sym, (Qlt_not_eq 0 (/p) F).
+- assert (G:= Qlt_minus_iff p 0).
+firstorder.
+clear H1.
+assert (G:= Qinv_lt_0_compat (0+-p) H0).
+assert (K:= (Qlt_not_eq 0 (/(0+-p)) G)).
+assert (L:= (Qnot_eq_sym 0 (/(0+-p)) K)).
+admit.
+- assert (U:= Qnot_eq_sym p 0 H).
+elim (U B).
 Qed.
 
 Lemma Qpower_nonzero : forall p n, ~ p==0 -> ~ p^n==0.
@@ -127,15 +147,6 @@ induction n.
   assumption.
 - apply (Qpower_not_0_positive p p0 G).
 - apply Qinv_nonzero, (Qpower_not_0_positive p p0 G).
-Qed.
-
-Lemma lt_from_le_nonzero: forall p, 0 <= p -> ~ p == 0 -> 0 < p.
-Proof.
-  intros p H G.
-  destruct (Qlt_le_dec 0 p) as [K|L].
-  - assumption.
-  - absurd (p == 0) ; auto.
-    apply Qle_antisym ; assumption.
 Qed.
 
 Lemma Qpower_strictly_pos : forall p n, 0 < p -> 0 < p^n.
