@@ -21,8 +21,7 @@ Defined.
 Definition Rmult : R -> R -> R.
 Admitted.
 
-(** Opposite value, we do this one by hand as an illustration.
-    We should really define it as an extension of [Qopp]. *)
+(** Opposite value. *)
 Definition Ropp : R -> R.
 Admitted.
 

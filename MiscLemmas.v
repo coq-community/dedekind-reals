@@ -18,7 +18,7 @@ Coercion Q_of_Qnonnegative : Qnonnegative >-> Q.
 
 Definition Qinterval (q r : Q) := { s : Q | q <= s /\ s <= r }.
 
-Definition Q_of_Qinterval a b (s : Qinterval a b) := projT1 s.
+Definition Q_of_Qinterval a b (sH : Qinterval a b) := projT1 sH.
 
 Coercion Q_of_Qinterval : Qinterval >-> Q.
 
@@ -121,21 +121,21 @@ Proof.
     apply Qle_antisym ; assumption.
 Qed.
 
+Lemma Qinv_gt_0_compat: forall a : Q, a < 0 -> / a < 0.
+Proof.
+  intros [[|n|n] d] Ha; assumption.
+Qed.
+
 Lemma Qinv_nonzero : forall p, ~ p == 0 -> ~ (/ p == 0).
 Proof.
 intros p H.
 destruct (Q_dec 0 p) as [[A1|A2]|B].
 - assert (F:= Qinv_lt_0_compat p A1).
-apply Qnot_eq_sym, (Qlt_not_eq 0 (/p) F).
-- assert (G:= Qlt_minus_iff p 0).
-firstorder.
-clear H1.
-assert (G:= Qinv_lt_0_compat (0+-p) H0).
-assert (K:= (Qlt_not_eq 0 (/(0+-p)) G)).
-assert (L:= (Qnot_eq_sym 0 (/(0+-p)) K)).
-admit.
-- assert (U:= Qnot_eq_sym p 0 H).
-elim (U B).
+  apply Qnot_eq_sym, (Qlt_not_eq 0 (/p) F).
+- assert (F:= Qinv_gt_0_compat p A2).
+  apply (Qlt_not_eq (/p) 0 F).
+- assert (U := Qnot_eq_sym p 0 H).
+  elim (U B).
 Qed.
 
 Lemma Qpower_nonzero : forall p n, ~ p==0 -> ~ p^n==0.
