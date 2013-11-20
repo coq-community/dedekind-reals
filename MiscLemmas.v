@@ -124,7 +124,6 @@ Proof.
     elim (A G).
 Qed.
 
-
 Lemma lt_from_le_nonzero: forall p, 0 <= p -> ~ p == 0 -> 0 < p.
 Proof.
   intros p H G.
