@@ -112,6 +112,19 @@ intros p H.
 compute ; auto.
 Qed.
 
+Lemma Qopp_nonzero : forall p, ~p==0 -> ~(-p)==0.
+Proof.
+  intros p A.
+  destruct (Q_dec 0 p) as [[B|C]|D].
+  - assert (E:= Qopp_lt_compat 0 p).
+    firstorder.
+  - assert (F:= Qopp_lt_compat p 0).
+    firstorder.
+  - assert (G:= Qeq_sym 0 p D).
+    elim (A G).
+Qed.
+
+
 Lemma lt_from_le_nonzero: forall p, 0 <= p -> ~ p == 0 -> 0 < p.
 Proof.
   intros p H G.
