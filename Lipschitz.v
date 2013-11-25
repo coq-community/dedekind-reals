@@ -8,7 +8,10 @@ Require Import Cut.
 Require Import MiscLemmas.
 Require Import QMetric.
 
-Record LocallyLipschitz {A B : Type} `{RationalMetric A} `{RationalMetric B} (f : A -> B) := {
+Record LocallyLipschitz
+      {A B : Type} `{RA : RationalMetric A} `{RB : RationalMetric B}
+      (f : A -> B) :=
+{
   modulus :> A -> Q -> Q ;
   modulus_nonnegative : forall x q, 0 <= modulus x q ;
   modulus_monotone : forall x q r, 0 <= q -> 0 <= r -> q <= r -> modulus x q <= modulus x r ;
@@ -39,8 +42,9 @@ Ltac liptac :=
     | [ |- _ ] => idtac
   end.
 
-Definition locally_lipschitz_compose
-         {A B C} `{RationalMetric A} `{RationalMetric B} `{RationalMetric C}
+Definition compose_LocallyLipschitz
+         {A B C} `{EA : Setoid A} `{EB : Setoid B} `{EC : Setoid C}
+         `{RA : RationalMetric A} `{RB : RationalMetric B} `{RC : RationalMetric C}
          (f : A -> B) (g : B -> C) (mf : LocallyLipschitz f) (mg : LocallyLipschitz g) :
   LocallyLipschitz (g o f).
 Proof.
@@ -70,11 +74,45 @@ Proof.
     + apply lipschitz_condition ; assumption.
 Defined.
 
-Definition extend {n : nat} (f : power n Q -> Q) `{LocallyLipschitz f} : power n R -> R.
+Definition extend {n : nat} (f : power1 n Q -> Q) `{LocallyLipschitz f} : power1 n R -> R.
 Admitted.
 
-Lemma extend_eq {n : nat} (f g : power n Q -> Q)
+Lemma extend_eq {n : nat} (f g : power1 n Q -> Q)
       `{mf : LocallyLipschitz f} `{mg : LocallyLipschitz g} :
-  (forall u v : power n Q, f u == g u) ->
-  (forall x y : power n R, @extend _ f mf x == @extend _ g mg y).
+  (forall u v : power1 n Q, f u == g u) ->
+  (forall x y : power1 n R, @extend _ f mf x == @extend _ g mg y).
 Admitted.
+
+Definition Qplus' : Q * Q -> Q := fun u => fst u + snd u.
+Hint Unfold Qplus'.
+
+Definition Qplus_LocallyLipschitz : LocallyLipschitz Qplus'.
+Proof.
+  refine {| modulus := fun _ _ => 1 |}.
+  - intros ; discriminate.
+  - intros ; discriminate.
+  - intros [a1 b1] [a2 b2] q _.
+    unfold Qplus', QMetric, ProductMetric, distance, fst, snd.
+    ring_simplify.
+    setoid_replace (a1 + b1 - (a2 + b2)) with ((a1 - a2) + (b1 - b2)) ;
+      [idtac | ring_simplify ; reflexivity].
+    apply Qabs_triangle.
+Defined.
+
+Definition Qmult' : Q * Q -> Q := fun u => fst u * snd u.
+
+Definition Qmult_LocallyLipschitz : LocallyLipschitz Qmult'.
+Proof.
+  refine {| modulus := fun u q => Qmax (Qabs (fst u)) (Qabs (snd u)) + q |}.
+  - admit.
+  - admit.
+  - admit.
+Defined.
+
+Definition Qopp_LocallyLipschitz : LocallyLipschitz Qopp.
+Proof.
+  refine {| modulus := fun _ _ => 1 |}.
+  - admit.
+  - admit.
+  - admit.
+Defined.
