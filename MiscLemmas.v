@@ -1,26 +1,46 @@
 (** Various lemmas that seem to be missing from the standard library. *)
 
-Require Import QArith Qminmax.
+Require Import QArith Qminmax Qabs.
+
+Definition compose {A B C} (g : B -> C) (f : A -> B) := fun x => g (f x).
+Hint Unfold compose.
+Notation "g 'o' f" := (compose g f) (at level 40, left associativity).
+
+Definition const {A} (x : A) : A -> A := (fun _ => x).
+
+Fixpoint power (n : nat) (A : Type) : Type :=
+  match n with
+    | 0%nat => unit
+    | S n => (power n A * A)%type
+  end.
+
+Fixpoint mv (n : nat) (A B : Type) : Type :=
+  match n with
+    | 0%nat => B
+    | S m => A -> mv m A B
+  end.
+
+Fixpoint power_curry {n : nat} {A B : Type} : (power n A -> B) -> mv n A B :=
+  match n return (power n A -> B) -> mv n A B with
+    | 0%nat => (fun f => f tt)
+    | S m => (fun f x => power_curry (fun xs => f (xs, x)))
+  end.
+
+Fixpoint power_uncurry {n : nat} {A B : Type} : mv n A B -> power n A -> B :=
+  match n return mv n A B -> power n A -> B with
+    | 0%nat => (fun b _ => b)
+    | S m => (fun f xs => power_uncurry (f (snd xs)) (fst xs))
+  end.
 
 Local Open Scope Q_scope.
 
 Definition Qpositive := {q : Q & q > 0}.
 
-Definition Q_of_Qpositive (q : Qpositive) := projT1 q.
-
-Coercion Q_of_Qpositive : Qpositive >-> Q.
+Coercion Q_of_Qpositive (q : Qpositive) := projT1 q.
 
 Definition Qnonnegative := {q : Q & q >= 0}.
 
-Definition Q_of_Qnonnegative (q : Qnonnegative) := projT1 q.
-
-Coercion Q_of_Qnonnegative : Qnonnegative >-> Q.
-
-Definition Qinterval (q r : Q) := { s : Q | q <= s /\ s <= r }.
-
-Definition Q_of_Qinterval a b (sH : Qinterval a b) := projT1 sH.
-
-Coercion Q_of_Qinterval : Qinterval >-> Q.
+Coercion Q_of_Qnonnegative (q : Qnonnegative) := projT1 q.
 
 Lemma Qopp_lt_compat : forall (p q : Q), p < q <-> -q < -p.
 Proof.
@@ -155,4 +175,28 @@ Proof.
   apply lt_from_le_nonzero.
   - apply Qpower_pos, Qlt_le_weak; assumption.
   - apply Qpower_nonzero, Qnot_eq_sym, Qlt_not_eq ; assumption.
+Qed.
+
+Lemma Qabs_eq_0 : forall q, Qabs q == 0 -> q == 0.
+Proof.
+  intros q Hq.
+  assert (Gq : Qabs q <= 0) ; [(rewrite Hq ; discriminate) | idtac].
+  destruct (proj1 (Qabs_Qle_condition q 0) Gq).
+  apply Qle_antisym; assumption.
+Qed.
+
+Lemma Qmult_le_compat_l : forall x y z, y <= z -> 0 <= x -> x*y <= x*z.
+Proof.
+  admit.
+Qed.
+
+Lemma Qmult_le_compat : forall q r s t,
+  q <= r -> 0 <= s -> 0 <= q -> s <= t -> q * s <= r * t.
+Proof.
+  intros q r s t H1 H2 H3 H4.
+  apply (Qle_trans _ (r * s)).
+  - apply Qmult_le_compat_r ; assumption.
+  - apply Qmult_le_compat_l.
+    + assumption.
+    + apply (Qle_trans _ q) ; assumption.
 Qed.

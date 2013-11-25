@@ -1,8 +1,9 @@
 (** Real arithmetic. *)
 
 Require Import MiscLemmas.
-Require Import QArith QOrderedType Qminmax.
+Require Import QArith QOrderedType Qminmax Qabs.
 Require Import Cut.
+Require Import QMetric.
 Require Import Lipschitz.
 
 Local Open Scope Q_scope.
@@ -10,7 +11,19 @@ Local Open Scope Q_scope.
 (** Addition. *)
 Definition Rplus : R -> R -> R.
 Proof.
-  apply (lipschitz_extend2 Qplus (fun _ _ _ _ => 1#1)).
+  pose (p := (fun u : Q * Q => fst u + snd u)).
+  assert (Lplus : locally_lipschitz p).
+  - exists (fun _ _ => 1).
+    unfold p.
+    intros [a b] s [q r] [u v] _ _.
+    unfold ProductQMetric, distance, QMetric.
+    ring_simplify.
+
+
+    
+
+
+  - apply (extend2 p).
   intros a b a' b' q r q' r'.
   split.
   - admit.

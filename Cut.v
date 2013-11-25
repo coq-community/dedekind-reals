@@ -1,7 +1,7 @@
 (** The definition of Dedekind cuts. *)
 
 Require Import QArith QOrderedType.
-Require Import Morphisms Setoid.
+Require Import Morphisms SetoidClass.
 Require Import MiscLemmas.
 
 (** A Dedekind cut is represented by the predicates [lower] and [upper]. *)
@@ -57,6 +57,8 @@ Proof.
     pose (G1' := G1 q) ; pose (G2' := G2 q) ;
     tauto.
 Qed.
+
+Instance Setoid_R : Setoid R := {| equiv := Req |}.
 
 (* A lower bound is smaller than an upper bound. *)
 Lemma lower_below_upper (x : R) (q r : Q) : lower x q -> upper x r -> q < r.
