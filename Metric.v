@@ -5,7 +5,7 @@ Require Import Setoid SetoidClass.
 Require Import QArith Qabs.
 Require Import MiscLemmas.
 
-Class RationalMetric A `{EqA : Setoid A} := {
+Class Metric A `{Setoid A} := {
   distance :> A -> A -> Q ;
   distance_proper : Proper (equiv ==> equiv ==> Qeq) distance ;
   distance_symmetric : forall x y, (distance x y == distance y x)%Q ;
@@ -15,12 +15,12 @@ Class RationalMetric A `{EqA : Setoid A} := {
   distance_triangle : forall x y z, (distance x z <= distance x y + distance y z)%Q
 }.
 
-Instance instance_distance_proper A `(Setoid A) `(RationalMetric A):
+Instance instance_distance_proper A `(Setoid A) `(Metric A):
   Proper (equiv ==> equiv ==> Qeq) distance := distance_proper.
 
 Instance Q_Qeq_Setoid : Setoid Q := {| equiv := Qeq ; setoid_equiv := Q_Setoid |}.
 
-Instance QMetric : RationalMetric Q.
+Instance QMetric : Metric Q.
 Proof.
   exists (fun q r => Qabs (q - r)).
   - intros q r Eqr s t Est.
@@ -54,8 +54,8 @@ Proof.
   intros [u1 u2] [v1 v2] [E1 E2] ; split ; assumption.
 Defined.
 
-Instance ProductMetric A B `{RA : RationalMetric A} `{RB : RationalMetric B} :
-  RationalMetric (prod A B).
+Instance ProductMetric A B `{RA : Metric A} `{RB : Metric B} :
+  Metric (prod A B).
 Proof.
   exists (fun u v => distance (fst u) (fst v) + distance (snd u) (snd v)).
   - intros [a1 b1] [a2 b2] E12 [a3 b3] [a4 b4] E34 ; simpl.
@@ -88,7 +88,7 @@ Proof.
   exists (fun _ _ => True) ; split ; auto.
 Defined.
 
-Instance UnitMetric : RationalMetric unit.
+Instance UnitMetric : Metric unit.
 Proof.
   exists (fun _ _ => 0).
   - intros ? ? _ ? ? _ ; reflexivity.
@@ -99,11 +99,11 @@ Proof.
   - intros ? ? ? ; discriminate.
 Defined.
 
-Instance PowerSetoid {n : nat} {A : Type} `{Setoid A} : Setoid (power n A).
+Instance PowerSetoid (n : nat) (A : Type) `{E : Setoid A} : Setoid A^^n.
 Proof.
   induction n.
-  - exact UnitSetoid.
-  - exists (fun (a b : power (S n) A) => fst a == fst b /\ snd a == snd b).
+  - exact E.
+  - exists (fun (a b : A^^(S n)) => fst a == fst b /\ snd a == snd b).
     split.
     + intros [xs x] ; split ; reflexivity.
     + intros [xs x] [ys y] [Hx Hy] ; split ; symmetry ; assumption.
@@ -111,10 +111,10 @@ Proof.
       split ; [transitivity ys | transitivity y] ; assumption.
 Defined.
 
-Instance PowerMetric {n : nat} {A : Type} `{RA : RationalMetric A} : RationalMetric (power n A).
+Instance PowerMetric (n : nat) (A : Type) `{RA : Metric A} : Metric A^^n.
 Proof.
   induction n.
-  - exact UnitMetric.
+  - exact RA.
   - exists distance.
     + intros ? ? ? ? ? ?. apply distance_proper ; assumption.
     + apply distance_symmetric.

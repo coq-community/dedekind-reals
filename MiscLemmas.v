@@ -8,29 +8,13 @@ Notation "g 'o' f" := (compose g f) (at level 40, left associativity).
 
 Definition const {A} (x : A) : A -> A := (fun _ => x).
 
-Fixpoint power (n : nat) (A : Type) : Type :=
+Fixpoint power1 (n : nat) (A : Type) : Type :=
   match n with
-    | 0%nat => unit
-    | S n => (power n A * A)%type
+    | 0%nat => A
+    | S n => (power1 n A * A)%type
   end.
 
-Fixpoint mv (n : nat) (A B : Type) : Type :=
-  match n with
-    | 0%nat => B
-    | S m => A -> mv m A B
-  end.
-
-Fixpoint power_curry {n : nat} {A B : Type} : (power n A -> B) -> mv n A B :=
-  match n return (power n A -> B) -> mv n A B with
-    | 0%nat => (fun f => f tt)
-    | S m => (fun f x => power_curry (fun xs => f (xs, x)))
-  end.
-
-Fixpoint power_uncurry {n : nat} {A B : Type} : mv n A B -> power n A -> B :=
-  match n return mv n A B -> power n A -> B with
-    | 0%nat => (fun b _ => b)
-    | S m => (fun f xs => power_uncurry (f (snd xs)) (fst xs))
-  end.
+Notation "A ^^ n" := (power1 n A) (at level 8, left associativity).
 
 Local Open Scope Q_scope.
 

@@ -3,40 +3,21 @@
 Require Import MiscLemmas.
 Require Import QArith QOrderedType Qminmax Qabs.
 Require Import Cut.
-Require Import QMetric.
+Require Import Metric.
 Require Import Lipschitz.
 
 Local Open Scope Q_scope.
 
 (** Addition. *)
-Definition Rplus : R -> R -> R.
-Proof.
-  pose (p := (fun u : Q * Q => fst u + snd u)).
-  assert (Lplus : locally_lipschitz p).
-  - exists (fun _ _ => 1).
-    unfold p.
-    intros [a b] s [q r] [u v] _ _.
-    unfold ProductQMetric, distance, QMetric.
-    ring_simplify.
+Definition Rplus' : R * R -> R := extend 1 0 Qplus'.
+Definition Rplus : R -> R -> R := fun x y => Rplus' (x, y).
 
-
-    
-
-
-  - apply (extend2 p).
-  intros a b a' b' q r q' r'.
-  split.
-  - admit.
-  - admit.
-Defined.
-    
 (** Multiplication. *)
-Definition Rmult : R -> R -> R.
-Admitted.
+Definition Rmult' : R * R -> R := extend 1 0 Qmult'.
+Definition Rmult : R -> R -> R := fun x y => Rmult' (x, y).
 
 (** Opposite value. *)
-Definition Ropp : R -> R.
-Admitted.
+Definition Ropp : R -> R := extend 0 0 Qopp.
 
 Definition Rminus x y := Rplus x (Ropp y).
 
@@ -67,6 +48,7 @@ Lemma Rplus_assoc (x y z : R) : (x + y) + z == x + (y + z).
 Admitted.
 
 Lemma Rplus_comm (x y : R) : x + y == y + x.
+Proof.
 Admitted.
 
 Lemma Rplus_0_l (x : R) : 0 + x == x.
@@ -107,3 +89,4 @@ Admitted.
 
 Lemma Qmult_plus_distr_l (x y z : R) : (x + y) * z == (x * z) + (y * z).
 Admitted.
+
