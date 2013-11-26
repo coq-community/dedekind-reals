@@ -20,19 +20,19 @@ Class Lip {A B} `{Metric A} `{Metric B} (lipfun : A -> B) :=
 
 Arguments modulus {A} {B} {_} {_} {_} {_} _ {_} _ _.
 
-Instance lip_constant {A} `{Metric A} (x : A) : Lip (const x).
+Instance lip_constant A B `{Metric A} `{Metric B} (y : B) : Lip (const A B y).
 Proof.
   refine {| modulus := (fun _ _ => 0) |}.
   - intros ? ; discriminate.
   - intros ? ? ? ? ; discriminate.
-  - intros y z q _.
+  - intros ? ? ? _.
     unfold const ; rewrite distance_diag ; ring_simplify.
     discriminate.
 Defined.
 
 Definition idmap {A} : A -> A := fun x => x.
 
-Instance lip_idmap {A} `{Metric A} : Lip (@idmap A).
+Instance lip_idmap A `{Metric A} : Lip (@idmap A).
 Admitted.
 
 Ltac liptac :=
@@ -91,7 +91,12 @@ Lemma extend_compose {k m n : nat}
 Admitted.
 
 Instance lip_fst {A B} `{Metric A} `{Metric B} : Lip (@fst A B).
-Admitted.
+Proof.
+  exists (fun _ _ => 1).
+  - intros ; discriminate.
+  - intros ; discriminate.
+  - intros. admit.
+Defined.
 
 Instance lip_snd {A B} `{Metric A} `{Metric B} : Lip (@snd A B).
 Admitted.

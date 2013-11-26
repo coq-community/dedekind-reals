@@ -6,29 +6,30 @@ Definition compose {A B C} (g : B -> C) (f : A -> B) := fun x => g (f x).
 Hint Unfold compose.
 Notation "g 'o' f" := (compose g f) (at level 40, left associativity).
 
-Definition const {A} (x : A) : A -> A := (fun _ => x).
+Definition const A B (y : B) : A -> B := (fun x => y).
 
+(* power1 n A is the (n+1)-fold power of A, for instance power1 3 A is A * A * A * A. *)
 Fixpoint power1 (n : nat) (A : Type) : Type :=
   match n with
     | 0%nat => A
-    | S n => (power1 n A * A)%type
+    | S m => (power1 m A * A)%type
   end.
 
-Notation "A ^^ n" := (power1 n A) (at level 8, left associativity).
+Notation "A ^^ n" := (power1 n A) (at level 8, left associativity) : type_scope.
 
 Local Open Scope Q_scope.
 
-Definition Qpositive := {q : Q & q > 0}.
+Definition Qpositive := {q : Q | q > 0}.
 
-Coercion Q_of_Qpositive (q : Qpositive) := projT1 q.
+Coercion Q_of_Qpositive (u : Qpositive) := projT1 u.
 
-Definition Qnonnegative := {q : Q & q >= 0}.
+Definition Qnonnegative := {q : Q | q >= 0}.
 
 Coercion Q_of_Qnonnegative (q : Qnonnegative) := projT1 q.
 
 Lemma Qopp_lt_compat : forall (p q : Q), p < q <-> -q < -p.
 Proof.
-  intros (a,b) (c,d).
+  intros [a b] [c d].
   unfold Qlt. simpl.
   rewrite !Z.mul_opp_l. omega.
 Defined.
@@ -41,7 +42,7 @@ Qed.
 Lemma Qmult_lt_positive : forall (p q : Q), 0 < p -> 0 < q -> 0 < p * q.
 Proof.
   intros p q pPos qPos.
-  rewrite <- (Qmult_0_l q) at 1.
+  rewrite <- (Qmult_0_l q).
   apply Qmult_lt_compat_r; assumption.
 Qed.
 
@@ -110,16 +111,16 @@ Qed.
 
 Require Import Qpower.
 
-Lemma Qpower_zero: forall p, ~p==0 -> p^0 == 1.
+Lemma Qpower_zero: forall p, ~p == 0 -> p^0 == 1.
 Proof.
 intros p H.
 compute ; auto.
 Qed.
 
-Lemma Qopp_nonzero : forall p, ~p==0 -> ~(-p)==0.
+Lemma Qopp_nonzero : forall p, ~ p == 0 -> ~ (-p) == 0.
 Proof.
   intros p A.
-  destruct (Q_dec 0 p) as [[B|C]|D].
+  destruct (Q_dec 0 p) as [ [ B | C ] | D ].
   - assert (E:= Qopp_lt_compat 0 p).
     firstorder.
   - assert (F:= Qopp_lt_compat p 0).

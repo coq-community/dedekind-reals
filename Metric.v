@@ -22,11 +22,11 @@ Instance Q_Qeq_Setoid : Setoid Q := {| equiv := Qeq ; setoid_equiv := Q_Setoid |
 
 Instance QMetric : Metric Q.
 Proof.
-  exists (fun q r => Qabs (q - r)).
+  refine {| distance := fun q r => Qabs (q - r) |}.
   - intros q r Eqr s t Est.
     rewrite Eqr; rewrite Est ; reflexivity.
   - intros q r ; rewrite (Qabs_Qminus q r) ; reflexivity.
-  - intros q r ; apply Qabs_nonneg.
+  - auto using Qabs_nonneg.
   - intros q ; setoid_replace (q - q) with 0 ; [reflexivity | (ring_simplify ; reflexivity)].
   - intros q r H.
     apply (Qplus_inj_r _ _ (-r)).
@@ -37,7 +37,7 @@ Proof.
     + ring.
 Defined.
 
-Instance ProdSetoid A B `{Setoid A} `{Setoid B} : Setoid (prod A B).
+Instance ProdSetoid A B `{Setoid A} `{Setoid B} : Setoid (A * B).
 Proof.
   exists (fun u v => (fst u == fst v) /\ (snd u == snd v)).
   split.
@@ -54,8 +54,8 @@ Proof.
   intros [u1 u2] [v1 v2] [E1 E2] ; split ; assumption.
 Defined.
 
-Instance ProductMetric A B `{RA : Metric A} `{RB : Metric B} :
-  Metric (prod A B).
+Instance ProductMetric A B `{Metric A} `{Metric B} :
+  Metric (A * B).
 Proof.
   exists (fun u v => distance (fst u) (fst v) + distance (snd u) (snd v)).
   - intros [a1 b1] [a2 b2] E12 [a3 b3] [a4 b4] E34 ; simpl.
@@ -111,10 +111,10 @@ Proof.
       split ; [transitivity ys | transitivity y] ; assumption.
 Defined.
 
-Instance PowerMetric (n : nat) (A : Type) `{RA : Metric A} : Metric A^^n.
+Instance PowerMetric (n : nat) (A : Type) `{MA : Metric A} : Metric A^^n.
 Proof.
   induction n.
-  - exact RA.
+  - exact MA.
   - exists distance.
     + intros ? ? ? ? ? ?. apply distance_proper ; assumption.
     + apply distance_symmetric.
