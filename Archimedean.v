@@ -1,3 +1,12 @@
+(* The Archimedean axiom.
+
+   Let q be a rational number. Say that p pair of rationals (l, u) "straddle a real x with
+   gap q" if l < x < u and u - l < q.
+
+   The Archimdean axiom is equivalent to the statement that for every x and positive q we
+   can find a straddling pair (u, l). In other words, this means we cna find arbitrarily
+   good lower and upper rational approximations to x.
+*)
 
 Require Import QArith.
 Require Import MiscLemmas.
@@ -36,18 +45,24 @@ Proof.
     + exists (((2#1) * l + u) * (1#3)), u.
       split ; [assumption | split ; [assumption | idtac]].
       apply (Qmult_lt_r _ _ (3#2)) ; [reflexivity | idtac].
-      simpl; ring_simplify.
-      setoid_replace (-6 # 6) with (-1#1); [assumption | reflexivity].
+      simpl ; ring_simplify.
+      setoid_replace (-6 # 6) with (-1#1) ; [idtac | reflexivity].
+      setoid_replace ((3 # 2) * two_thirds q) with q ; [assumption | idtac].
+      unfold two_thirds, Q_of_Qpositive ; simpl ; ring_simplify ; reflexivity.
     + exists l, (((2#1) * u + l) * (1#3)).
       split ; [assumption | split ; [assumption | idtac]].
       apply (Qmult_lt_r _ _ (3#2)) ; [reflexivity | idtac].
       simpl; ring_simplify.
-      setoid_replace (-6 # 6) with (-1#1) ; [assumption | reflexivity].
+      setoid_replace (-6 # 6) with (-1#1) ; [idtac | reflexivity].
+      setoid_replace ((3 # 2) * two_thirds q) with q ; [assumption | idtac].
+      unfold two_thirds, Q_of_Qpositive ; simpl ; ring_simplify ; reflexivity.
 Defined.
 
-Lemma two_third_power_small :
+Lemma two_thirds_power_small :
   forall q : Qpositive, { n : nat | (2#3)^(Z_of_nat n) < q }.
-Admitted.
+Proof.
+  admit.
+Qed.
 
 Lemma archimedean (x : R) (q : Qpositive) : straddle x q.
 Proof.
@@ -59,7 +74,7 @@ Proof.
       apply (lower_below_upper x); assumption.
     + ring_simplify. exact (projT2 q).
   - pose (r := existT _ (q / (u - l)) H : Qpositive).
-    destruct (two_third_power_small r) as [n G].
+    destruct (two_thirds_power_small r) as [n G].
     induction n.
     + exists l, u.
       split ; [assumption | split ; [assumption | idtac]].
@@ -73,4 +88,3 @@ Proof.
         apply (lower_below_upper x); assumption.
     + admit.
 Qed.
-
