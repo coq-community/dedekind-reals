@@ -27,6 +27,14 @@ Definition Qnonnegative := {q : Q | q >= 0}.
 
 Coercion Q_of_Qnonnegative (q : Qnonnegative) := projT1 q.
 
+Lemma Qeq_le (p q : Q) : p == q -> p <= q.
+Proof.
+  intro E.
+  rewrite E.
+  apply Qle_refl.
+Defined.
+
+
 Lemma Qopp_lt_compat : forall (p q : Q), p < q <-> -q < -p.
 Proof.
   intros [a b] [c d].

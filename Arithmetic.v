@@ -1,5 +1,6 @@
 (** Real arithmetic. *)
 
+Require Import Setoid Morphisms SetoidClass.
 Require Import MiscLemmas.
 Require Import QArith QOrderedType Qminmax Qabs.
 Require Import Cut.
@@ -49,10 +50,28 @@ Admitted.
 
 Lemma Rplus_comm (x y : R) : x + y == y + x.
 Proof.
-Admitted.
+  transitivity (extend 1 0 (Qplus' o proj_12_21) (x,y)).
+  - unfold proj_12_21.
+    apply (extend_eq 1 0) ; [ idtac | reflexivity ].
+    intros [q r].
+    unfold Qplus', compose, pairing, fst, snd.
+    apply (Qplus_comm q r).
+
+  - unfold proj_12_21. autorewrite with extend_rewrites.
+    unfold Rplus, Rplus'.
+    apply (extend_proper 1 0).
+    split.
+    + unfold fst ; apply extend_snd.
+    + unfold snd ; apply extend_fst.
+Qed.
 
 Lemma Rplus_0_l (x : R) : 0 + x == x.
-Admitted.
+Proof.
+  transitivity (extend 0 0 (Qplus' o (pairing (const Q Q 0%Q) (@idmap Q))) x).
+  - admit.
+  - autorewrite with extend_rewrites.
+    
+Qed.
 
 Lemma Rplus_0_r (x : R) : x + 0 == x.
 Admitted.

@@ -18,11 +18,23 @@ Class Lip {A B} `{Metric A} `{Metric B} (lipfun : A -> B) :=
       distance x y <= q -> distance (lipfun x) (lipfun y) <= modulus x q * distance x y
 }.
 
-Arguments modulus {A} {B} {_} {_} {_} {_} _ {_} _ _.
+Arguments modulus {A} {B} {_} {_} _ {_} _ _.
 
-Instance lip_constant A B `{Metric A} `{Metric B} (y : B) : Lip (const A B y).
+Instance lip_proper A B (f : A -> B) `{Lip _ _ f} :
+  Proper (equiv ==> equiv) f.
 Proof.
-  refine {| modulus := (fun _ _ => 0) |}.
+  intros x y Exy.
+  apply distance_leq_0_eq_0.
+  setoid_replace 0 with (modulus f x 0 * distance x y).
+  - apply lipschitz_condition, Qeq_le ; assumption.
+  - setoid_replace (distance x y) with 0.
+    + ring_simplify ; reflexivity.
+    + exact Exy.
+Qed. 
+
+Instance lip_const A B `{Metric A} `{Metric B} (y : B) : Lip (const A B y) :=
+  {| modulus := (fun _ _ => 0) |}.
+Proof.
   - intros ? ; discriminate.
   - intros ? ? ? ? ; discriminate.
   - intros ? ? ? _.
@@ -47,13 +59,10 @@ Ltac liptac :=
   end.
 
 Instance lip_compose {A B C} `{MA : Metric A} `{MB : Metric B} `{MC : Metric C}
-           (g : B -> C) `{@Lip B C _ MB _ MC g}
-           (f : A -> B) `{@Lip A B _ MA _ MB f} :
-  Lip (g o f).
+           (g : B -> C) `{@Lip _ _ MB MC g}
+           (f : A -> B) `{@Lip _ _ MA MB f} : Lip (g o f) :=
+  {| modulus := fun x q => modulus g (f x) (q * modulus f x q) * modulus f x q |}.
 Proof.
-  refine {|
-      modulus := fun x q => modulus g (f x) (q * modulus f x q) * modulus f x q
-         |}.
   - intros ; liptac.
   - intros ; liptac.
   - intros x y q G.
@@ -73,20 +82,27 @@ Proof.
 Defined.
 
 Definition extend (m n : nat) (f : Q^^m -> Q^^n)
-           `{@Lip (Q^^m) (Q^^n) _ (PowerMetric m Q) _ (PowerMetric n Q) f} :
-  R^^m -> R^^n.
+           `{@Lip _ _ _ _ f} : R^^m -> R^^n.
 Admitted.
 
-Lemma extend_eq {m n : nat}
-      f `{@Lip (Q^^m) (Q^^n) _ (PowerMetric m Q) _ (PowerMetric n Q) f}
-      g `{@Lip (Q^^m) (Q^^n) _ (PowerMetric m Q) _ (PowerMetric n Q) g} :
-  (forall u v : Q^^m, f u == g u) ->
-  (forall x y : R^^m , extend m n f x == extend m n g y).
+Lemma extend_eq (m n : nat)
+      (f : Q^^m -> Q^^n) `{@Lip _ _ _ _ f}
+      (g : Q^^m -> Q^^n) `{@Lip _ _ _ _ g} :
+  (forall u : Q^^m, f u == g u) ->
+  (forall x y: R^^m , x == y -> extend m n f x == extend m n g y).
 Admitted.
+
+Instance extend_proper (m n : nat) (f : Q^^m -> Q^^n) `{@Lip _ _ _ _ f} :
+  Proper (equiv ==> equiv) (extend m n f).
+Proof.
+  intros x y Exy.
+  apply extend_eq ; auto.
+  intro ; reflexivity.
+Qed.
 
 Lemma extend_compose {k m n : nat} 
-      g `{@Lip (Q^^m) (Q^^n) _ (PowerMetric m Q) _ (PowerMetric n Q) g}
-      f `{@Lip (Q^^k) (Q^^m) _ (PowerMetric k Q) _ (PowerMetric m Q) f} :
+      (g : Q^^m -> Q^^n) `{@Lip _ _ _ _ g}
+      (f : Q^^k -> Q^^m) `{@Lip _ _ _ _ f} :
   forall u : R^^k, extend k n (g o f) u == extend m n g (extend k m f u).
 Admitted.
 
@@ -98,8 +114,18 @@ Proof.
   - intros. admit.
 Defined.
 
+Lemma extend_fst : forall u, extend 1 0 fst u == fst u.
+Proof.
+  admit.
+Qed.
+  
 Instance lip_snd {A B} `{Metric A} `{Metric B} : Lip (@snd A B).
 Admitted.
+
+Lemma extend_snd : forall u, extend 1 0 snd u == snd u.
+Proof.
+  admit.
+Qed.
 
 Definition pairing {A B C} (f : A -> B) (g : A -> C) : A -> B * C :=
   fun x => (f x, g x).
@@ -108,6 +134,16 @@ Instance lip_pairing {A B C}
          (f : A -> B) `{Lip A B f}
          (g : A -> C) `{Lip A C g} : Lip (pairing f g).
 Admitted.
+
+Lemma extend_pairing (n : nat)
+      (f : Q^^n -> Q^^0) `{@Lip _ _ _ _ f}
+      (g : Q^^n -> Q^^0) `{@Lip _ _ _ _ g} :
+  forall u, extend n 1 (pairing f g) u == (extend n 0 f u, extend n 0 g u).
+Proof.
+  admit.
+Qed.
+
+Hint Rewrite @extend_compose @extend_pairing @extend_fst @extend_snd : extend_rewrites.
 
 (* Projecting one of three component. *)
 Definition proj_123_1 : Q^^2 -> Q^^0 :=
@@ -145,4 +181,3 @@ Admitted.
 
 Instance lip_opp : Lip Qopp.
 Admitted.
-  

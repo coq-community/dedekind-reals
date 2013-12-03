@@ -60,6 +60,18 @@ Qed.
 
 Instance Setoid_R : Setoid R := {| equiv := Req |}.
 
+Instance Setoid_R_power (n : nat) : Setoid R^^n.
+Proof.
+  induction n.
+  - exact Setoid_R.
+  - exists (fun xs ys => fst xs == fst ys /\ snd xs == snd ys).
+    split.
+    + intros xs ; split ; reflexivity.
+    + intros xs ys [H1 H2] ; split ; symmetry ; assumption.
+    + intros xs ys zs [H1 H2] [G1 G2] ; split ;
+      [ transitivity (fst ys) | transitivity (snd ys) ] ; assumption.
+Defined.
+
 (* A lower bound is smaller than an upper bound. *)
 Lemma lower_below_upper (x : R) (q r : Q) : lower x q -> upper x r -> q < r.
 Proof.
