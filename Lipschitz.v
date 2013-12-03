@@ -20,6 +20,7 @@ Class Lip {A B} `{Metric A} `{Metric B} (lipfun : A -> B) :=
 
 Arguments modulus {A} {B} {_} {_} _ {_} _ _.
 
+(*
 Instance lip_proper A B (f : A -> B) `{Lip _ _ f} :
   Proper (equiv ==> equiv) f.
 Proof.
@@ -31,6 +32,7 @@ Proof.
     + ring_simplify ; reflexivity.
     + exact Exy.
 Qed. 
+*)
 
 Instance lip_const A B `{Metric A} `{Metric B} (y : B) : Lip (const A B y) :=
   {| modulus := (fun _ _ => 0) |}.
@@ -81,9 +83,21 @@ Proof.
     + apply lipschitz_condition ; assumption.
 Defined.
 
+Definition extend1 (m n : nat) (f : Q^^m -> Q)
+           `{@Lip _ _ _ _ f} : R^^m -> R.
+Proof.
+  intro xs.
+  refine {|
+      lower := (fun q => q < 0) ;
+      upper := (fun r => 0 < r)       
+    |}.
+Defined.
+
 Definition extend (m n : nat) (f : Q^^m -> Q^^n)
            `{@Lip _ _ _ _ f} : R^^m -> R^^n.
-Admitted.
+Proof.
+  admit.
+Defined.
 
 Lemma extend_eq (m n : nat)
       (f : Q^^m -> Q^^n) `{@Lip _ _ _ _ f}

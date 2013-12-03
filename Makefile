@@ -80,11 +80,8 @@ endif
 #                    #
 ######################
 
-VFILES:=Archimedean.v\
-  Arithmetic.v\
+VFILES:= Arithmetic.v\
   Cut.v\
-  Lipschitz.v\
-  Metric.v\
   MiscLemmas.v
 
 -include $(addsuffix .d,$(VFILES))

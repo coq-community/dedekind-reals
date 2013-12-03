@@ -4,21 +4,101 @@ Require Import Setoid Morphisms SetoidClass.
 Require Import MiscLemmas.
 Require Import QArith QOrderedType Qminmax Qabs.
 Require Import Cut.
-Require Import Metric.
-Require Import Lipschitz.
+(* Require Import Metric. *)
+(* Require Import Lipschitz. *)
 
 Local Open Scope Q_scope.
 
 (** Addition. *)
-Definition Rplus' : R * R -> R := extend 1 0 Qplus'.
-Definition Rplus : R -> R -> R := fun x y => Rplus' (x, y).
+Definition Rplus : R -> R -> R.
+Proof.
+  intros x y.
+  refine {|
+      lower := (fun q => exists r s, q < r + s /\ lower x r /\ lower y s) ;
+      upper := (fun q => exists r s, r + s < q /\ upper x r /\ upper y s)
+    |}.
+  - intros u v Euv.
+    split ; intros [r [s [H1 [H2 H3]]]] ; exists r, s ; split ; auto.
+    + setoid_rewrite <- Euv ; assumption.
+    + setoid_rewrite Euv ; assumption.
+  - intros u v Euv.
+    split ; intros [r [s [H1 [H2 H3]]]] ; exists r, s ; split ; auto.
+    + setoid_rewrite <- Euv ; assumption.
+    + setoid_rewrite Euv ; assumption.
+  - destruct (lower_bound x) as [q H].
+    destruct (lower_bound y) as [r G].
+    exists (q + r).
+    destruct (lower_open x q H) as [q' [Lqq' H']].
+    destruct (lower_open y r G) as [r' [Lrr' G']].
+    exists q', r' ; split ; auto.
+    apply Qplus_lt_lt_compat ; assumption.
+  - admit. (* similar to previous case *)
+  - intros q r Lqr [r' [s' [H1 [H2 H3]]]].
+    exists r', s' ; split ; auto.
+    transitivity r ; assumption.
+  - intros q [r [s [H1 [H2 H3]]]].
+    exists ((q + r + s) * (1#2)) ; split.
+    + admit.
+    + exists r, s ; split ; auto.
+      admit.
+  (* the next two cases are similar to the previous two cases. *)
+  - admit.
+  - admit.
+  - intros q [[r [s [H1 [H2 H3]]]] [r' [s' [G1 [G2 G3]]]]].
+    apply (Qlt_irrefl q).
+    transitivity (r + s) ; auto.
+    transitivity (r' + s') ; auto.
+    apply Qplus_lt_lt_compat ; [apply (lower_below_upper x) | apply (lower_below_upper y) ] ; auto.
+  - intros q r Lqr.
+    admit.
+Defined.
 
 (** Multiplication. *)
-Definition Rmult' : R * R -> R := extend 1 0 Qmult'.
-Definition Rmult : R -> R -> R := fun x y => Rmult' (x, y).
+Definition Rmult : R -> R -> R.
+Proof.
+  admit.
+Defined.
 
 (** Opposite value. *)
-Definition Ropp : R -> R := extend 0 0 Qopp.
+Definition Ropp : R -> R.
+Proof.
+  intro x.
+  refine {| lower := (fun q => upper x (-q)); upper := (fun r => lower x (-r)) |}.
+  - intros ? ? H. rewrite H; tauto.
+  - intros ? ? H. rewrite H; tauto.
+  - destruct (upper_bound x) as [r H].
+    exists (- r).
+    rewrite (Qopp_involutive r); assumption.
+  - destruct (lower_bound x) as [q H].
+    exists (- q).
+    rewrite (Qopp_involutive q); assumption.
+  - intros q r H G.
+    apply (upper_upper _ (- r) _); [idtac | assumption].
+    apply Qopp_lt_compat.
+    rewrite 2 Qopp_involutive; assumption.
+  - intros q H.
+    destruct (upper_open x (-q)) as [s [G1 G2]]; [assumption | idtac].
+    exists (-s); split.
+    apply Qopp_lt_shift_r; assumption.
+    rewrite Qopp_involutive; assumption.
+  - intros q r H G.
+    apply (lower_lower _ _ (- q)) ; [idtac | assumption].
+    apply Qopp_lt_compat.
+    rewrite 2 Qopp_involutive; assumption.
+  - intros q H.
+    destruct (lower_open x (-q)) as [s [G1 G2]]; [assumption | idtac].
+    exists (-s); split.
+    apply Qopp_lt_shift_l; assumption.
+    rewrite Qopp_involutive; assumption.
+  - intros q.
+    assert (H := disjoint x (- q)).
+    tauto.
+  - intros q r H.
+    destruct (located x (-r) (-q)).
+    + apply Qopp_lt_compat; rewrite 2 Qopp_involutive; assumption.
+    + right; assumption.
+    + left; assumption.
+Defined.
 
 Definition Rminus x y := Rplus x (Ropp y).
 
@@ -46,31 +126,39 @@ Local Open Scope R_scope.
 (** Properties of addition. *)
 
 Lemma Rplus_assoc (x y z : R) : (x + y) + z == x + (y + z).
-Admitted.
-
+Proof.
+  split.
+  - intro q ; split ; intro H.
+    + destruct H as [s [r [G1 [[s' [r' [K1 [K2 K3]]]] G3]]]].
+      exists s', (r + r')%Q ; split.
+      * admit.
+      * admit.
+    + admit.
+  - intro q ; split ; intro H.
+    + admit.
+    + admit.
+Qed.
+   
 Lemma Rplus_comm (x y : R) : x + y == y + x.
 Proof.
-  transitivity (extend 1 0 (Qplus' o proj_12_21) (x,y)).
-  - unfold proj_12_21.
-    apply (extend_eq 1 0) ; [ idtac | reflexivity ].
-    intros [q r].
-    unfold Qplus', compose, pairing, fst, snd.
-    apply (Qplus_comm q r).
-
-  - unfold proj_12_21. autorewrite with extend_rewrites.
-    unfold Rplus, Rplus'.
-    apply (extend_proper 1 0).
-    split.
-    + unfold fst ; apply extend_snd.
-    + unfold snd ; apply extend_fst.
+  split ; intro q ; split ; intros [r [s [G1 [G2 G3]]]] ; exists s, r ; split ; auto ;
+  setoid_rewrite (Qplus_comm s r) ; assumption.
 Qed.
 
 Lemma Rplus_0_l (x : R) : 0 + x == x.
 Proof.
-  transitivity (extend 0 0 (Qplus' o (pairing (const Q Q 0%Q) (@idmap Q))) x).
+  split ; intro q ; split.
+  - intros [r [s [H1 [H2 H3]]]].
+    apply (lower_lower x q s) ; auto.
+    admit. (* use the fact that r < 0 *)
+  - intro H.
+    destruct (lower_open x q H) as [r [G1 G2]].
+    exists ((q - r) * (1#2))%Q, r ; split.
+    + admit.
+    + split ; auto.
+      admit. (* This just says (q - r) * (1#2) < 0 *)
   - admit.
-  - autorewrite with extend_rewrites.
-    
+  - admit.
 Qed.
 
 Lemma Rplus_0_r (x : R) : x + 0 == x.
@@ -93,13 +181,26 @@ Admitted.
 (** Properties of opposite. *)
 
 Lemma Ropp_involutive (x : R) : - (- x) == x.
-Admitted.
+Proof.
+  split ; intro q ; split ; intro H ; simpl in * |- * ;
+  rewrite Qopp_opp in * |- * ; assumption.
+Qed.
 
 Lemma Rpluss_opp_r (x : R) : x + (- x) == 0.
-Admitted.
+Proof.
+  split ; intro q ; split ; intro H.
+   - destruct H as [r [s [G1 [G2 G3]]]].
+     apply (lower_lower 0 q (r + s)); auto.
+     admit.
+  - admit.
+  - admit.
+  - admit.
+Qed.
 
 Lemma Rplus_opp_l (x : R) : (- x) + x == 0.
-Admitted.
+Proof.
+  admit. (* Use Rplus_comm here. *)
+Qed.
 
 (* Distributivity *)
 

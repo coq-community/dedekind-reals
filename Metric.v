@@ -13,6 +13,7 @@ Class Metric A := {
   distance_triangle : forall x y z, (distance x z <= distance x y + distance y z)%Q
 }.
 
+(*
 Instance Metric_Setoid A `{Metric A} : Setoid A :=
   {| equiv := fun (x y : A) => (distance x y == 0)%Q |}.
 Proof.
@@ -25,6 +26,7 @@ Proof.
     setoid_replace 0 with (distance x y + distance y z) ; [ apply distance_triangle | idtac ].
     rewrite G1 ; rewrite G2 ; reflexivity.
 Defined.
+*)
 
 Lemma distance_leq_0_eq_0 A `(Metric A) (x y : A) :
   distance x y <= 0 -> (distance x y == 0)%Q.
@@ -44,6 +46,7 @@ Proof.
     rewrite (distance_symmetric y x) ; rewrite Dxy ; ring_simplify ; apply Qle_refl.
 Qed.
 
+(*
 Instance instance_distance_proper A `(Metric A):
   Proper (equiv ==> equiv ==> Qeq) distance.
 Proof.
@@ -53,6 +56,9 @@ Proof.
   setoid_rewrite distance_symmetric at 1 2.
   apply distance_0_eq ; assumption.
 Qed.
+*)
+
+Instance QSetoid : Setoid Q := {| equiv := Qeq |}.
 
 Instance QMetric : Metric Q := {| distance := fun q r => Qabs (q - r) |}.
 Proof.
@@ -65,7 +71,6 @@ Proof.
     + ring.
 Defined.
 
-(*
 Instance ProdSetoid A B `{Setoid A} `{Setoid B} : Setoid (A * B).
 Proof.
   exists (fun u v => (fst u == fst v) /\ (snd u == snd v)).
@@ -82,7 +87,6 @@ Lemma decompose_equal_pair {A} {B} `{Setoid A} `{Setoid B} :
 Proof.
   intros [u1 u2] [v1 v2] [E1 E2] ; split ; assumption.
 Defined.
-*)
 
 Instance ProductMetric A B `{Metric A} `{Metric B} : Metric (A * B) :=
   {| distance := fun u v => distance (fst u) (fst v) + distance (snd u) (snd v) |}.
@@ -102,6 +106,11 @@ Proof.
       apply distance_triangle.
 Defined.
 
+Instance UnitSetoid : Setoid unit := {| equiv := fun _ _ => True |}.
+Proof.
+  split ; auto.
+Defined.
+
 Instance UnitMetric : Metric unit := {| distance := fun _ _ => 0 |}.
 Proof.
   - reflexivity.
@@ -110,7 +119,6 @@ Proof.
   - intros ? ? ? ; discriminate.
 Defined.
 
-(*
 Instance PowerSetoid (n : nat) (A : Type) `{E : Setoid A} : Setoid A^^n.
 Proof.
   induction n.
@@ -122,7 +130,6 @@ Proof.
     + intros [xs x] [ys y] [zs z] [Hxys Hxy] [Hyzs Hyz] ;
       split ; [transitivity ys | transitivity y] ; assumption.
 Defined.
-*)
 
 Instance PowerMetric (n : nat) (A : Type) `(MA : Metric A) : Metric A^^n.
 Proof.
@@ -134,4 +141,3 @@ Proof.
     + apply distance_diag.
     + apply distance_triangle.
 Defined.
-
