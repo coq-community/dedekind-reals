@@ -138,7 +138,7 @@ Proof.
     + admit.
     + admit.
 Qed.
-   
+
 Lemma Rplus_comm (x y : R) : x + y == y + x.
 Proof.
   split ; intro q ; split ; intros [r [s [G1 [G2 G3]]]] ; exists s, r ; split ; auto ;
