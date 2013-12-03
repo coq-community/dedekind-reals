@@ -45,6 +45,12 @@ Local Open Scope R_scope.
 (** Properties of addition. *)
 
 Lemma Rplus_assoc (x y z : R) : (x + y) + z == x + (y + z).
+Proof.
+unfold Req, Rplus.
+split.
+  - split.
+    + firstorder.
+    unfold lower.
 Admitted.
 
 Lemma Rplus_comm (x y : R) : x + y == y + x.
