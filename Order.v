@@ -3,7 +3,7 @@
 Require Import Morphisms Setoid.
 Require Import QArith.
 Require Import Cut.
-Require Import Arithmetic.
+Require Import Additive Multiplication.
 
 Local Open Scope R_scope.
 
@@ -24,6 +24,24 @@ Theorem Rlt_linear : forall (x y z : R), x < y -> x < z \/ z < y.
 Proof.
   admit.
 Qed.
+
+(* Properties of <> *)
+
+Theorem Rneq_symm : forall x y : R, x <> y -> y <> x.
+Proof.
+  admit.
+Qed.
+
+Theorem Rneq_irrefl : forall x : R, ~ (x <> x).
+Proof.
+  admit.
+Qed.
+
+Theorem Rnew_contrans : forall x y z : R, x <> y -> x <> z \/ y <> z.
+Proof.
+  admit.
+Qed.
+
 
 (* Properties of <= *)
 
@@ -117,4 +135,3 @@ Theorem Rmult_lt_compat_l : forall (x y z : R), 0 < x -> (y < z <-> x * y < x * 
 Proof.
   admit.
 Qed.
-
