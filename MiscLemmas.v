@@ -54,6 +54,16 @@ Proof.
   apply Qmult_lt_compat_r; assumption.
 Qed.
 
+Lemma Qlt_mult_neg_r (q r s : Q) : s < 0 -> (q < r <-> r * s < q * s).
+Proof.
+  admit.
+Qed.
+
+Lemma Qlt_mult_neg_l (q r s : Q) : q < 0 -> (r < s <-> q * s < q * r).
+Proof.
+  admit.
+Qed.
+
 Lemma Qopp_lt_shift_l : forall (p q : Q), -p < q <-> -q < p.
 Proof.
   intros p q; split; intro H.

@@ -94,19 +94,30 @@ Proof.
   - admit.
   - admit.
 Qed.
-
+ 
 Lemma Rmult_1_l (x : R) : (1 * x == x)%R.
 Proof.
   split ; intro q ; split.
-  - intros [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
-    apply (lower_lower x q c) ; auto.
-    admit.
+  - intros [a [b [c [d [H1 [H2 [H3 [H4 [H5 [H6 [H7 H8]]]]]]]]]]].
+    destruct (Q_dec c 0) as [[G|G]|G].
+    + apply (lower_lower x q c) ; auto.
+      transitivity (b * c) ; auto.
+      setoid_replace c with (1 * c) at 2 ; [ idtac | (ring_simplify ; reflexivity) ].
+      apply Qlt_mult_neg_r ; auto.
+    + apply (lower_lower x q c) ; auto.
+      transitivity (a * c) ; auto.
+      setoid_replace c with (1 * c) at 2 ; [ idtac | (ring_simplify ; reflexivity) ].
+      apply Qmult_lt_compat_r ; assumption.
+    + rewrite G in * |- *.
+      apply (lower_lower x q 0) ; auto.
+      apply (Qlt_le_trans _ (a * 0)) ; auto.
+      ring_simplify ; discriminate.
   - admit.
   - admit.
   - admit.
 Qed.
 
-Lemma Rmult_1_r (x : R) : x * 1 == x.
+Lemma Rmult_1_r (x : R) : (x * 1 == x)%R.
 Proof.
   (* Use Rmult_comm and Rmult_1_l. *)
   admit.
@@ -114,15 +125,75 @@ Qed.
 
 (* Distributivity *)
 
-Lemma Qmult_plus_distr_r (x y z : R) : x * (y + z) == (x * y) + (x * z).
+Lemma Qmult_plus_distr_r (x y z : R) : (x * (y + z) == (x * y) + (x * z))%R.
 Admitted.
 
-Lemma Qmult_plus_distr_l (x y z : R) : (x + y) * z == (x * z) + (y * z).
+Lemma Qmult_plus_distr_l (x y z : R) : ((x + y) * z == (x * z) + (y * z))%R.
 Admitted.
 
 (* Inverse. *)
 
-Theorem R_field : forall x : R, x <> 0 -> { y | x * y == 1 }.
+Theorem Rinv_apart_0 : forall x : R, ({ y | x * y == 1 } -> x ## 0)%R.
+Proof.
+  intros x [y E].
+  admit.
+Qed.
+
+
+(* The inverse of a positive real. *)
+Definition Rinv_pos : forall x : R, (0 < x -> R)%R.
+Proof.
+  intros x H.
+  refine {|
+      lower := (fun q => exists r, upper x r /\ q * r < 1) ;
+      upper := (fun q => exists r, lower x r /\ 1 < q * r)
+    |}.
+  - admit.
+  - admit. 
+  - admit. 
+  - admit. 
+  - admit. 
+  - admit. 
+  - admit. 
+  - admit. 
+  - admit. 
+  - admit. 
+Defined.
+
+Definition Rinv_neg : forall x : R, (x < 0 -> R)%R.
+Proof.
+  intros x H.
+  refine {|
+      lower := (fun q => exists r, lower x r /\ q * r < 1) ;
+      upper := (fun q => exists r, upper x r /\ 1 < q * r)
+    |}.
+  - admit.
+  - admit. 
+  - admit. 
+  - admit. 
+  - admit. 
+  - admit. 
+  - admit. 
+  - admit. 
+  - admit. 
+  - admit. 
+Defined.
+
+Theorem R_field : forall x : R, (x ## 0  -> { y | x * y == 1 })%R.
+Proof.
+  intros x [H|H].
+  - exists (Rinv_neg x H).
+    split ; intro q ; split.
+    + intros [a [b [c [d [H1 [H2 [[r [R1 R2]] [[s [S1 S2]] [H5 [H6 [H7 H8]]]]]]]]]]].
+      admit.
+    + admit.
+    + admit.
+    + admit.
+  - exists (Rinv_pos x H).
+    admit.
+Qed.
+
+Theorem R_inv_apart_0 : forall x : R, ({y | x * y == 1} -> x ## 0)%R.
 Proof.
   admit.
 Qed.

@@ -25,19 +25,19 @@ Proof.
   admit.
 Qed.
 
-(* Properties of <> *)
+(* Properties of apartness ## *)
 
-Theorem Rneq_symm : forall x y : R, x <> y -> y <> x.
+Theorem Rneq_symm : forall x y : R, x ## y -> y ## x.
 Proof.
   admit.
 Qed.
 
-Theorem Rneq_irrefl : forall x : R, ~ (x <> x).
+Theorem Rneq_irrefl : forall x : R, x ## x -> Empty_set.
 Proof.
   admit.
 Qed.
 
-Theorem Rnew_contrans : forall x y z : R, x <> y -> x <> z \/ y <> z.
+Theorem Rnew_contrans : forall x y z : R, x ## y -> ((x ## z) + (y ## z))%type.
 Proof.
   admit.
 Qed.

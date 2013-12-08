@@ -58,14 +58,14 @@ Proof.
 Qed.
 
 (** Apartness. *)
-Definition Rneq (x y : R) := Rlt x y \/ Rlt y x.
+Definition Rneq (x y : R) := {Rlt x y} + {Rlt y x}.
 
 (** We introduce notation for equality, order and apartness. We put the notation
     in the scope [R_scope] which can then be opened whenever needed. *)
 Infix "<=" := Rle : R_scope.
 Infix "<" := Rlt : R_scope.
 Infix "==" := Req : R_scope.
-Infix "<>" := Rneq (at level 70, no associativity) : R_scope.
+Infix "##" := Rneq (at level 70, no associativity) : R_scope.
 
 (** This allows us to write [(....)%R] to indicate that notation in a given expression
     should be understood as taking place in R_scope. *)
