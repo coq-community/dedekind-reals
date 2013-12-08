@@ -26,7 +26,9 @@ Qed.
 
 Let mult_upper_proper (x y : R) : Proper (Qeq ==> iff) (mult_upper x y).
 Proof.
-  admit.
+  intros q r Eqr ; split ; intros [a [b [c [d H]]]].
+  - exists a, b, c, d ; setoid_rewrite <- Eqr ; assumption.
+  - exists a, b, c, d ; setoid_rewrite -> Eqr ; assumption.
 Qed.
 
 Definition Rmult : R -> R -> R.
@@ -40,7 +42,26 @@ Proof.
   - apply mult_upper_proper.
   - admit.
   - admit.
-  - admit.
+  - intros q r H K.
+    unfold mult_lower.
+    destruct K.
+    firstorder.
+    exists x0, x1, x2, x3.
+    split.
+    assumption.
+    split.
+    assumption.
+    split.
+    assumption.
+    split.
+    assumption.
+    split.
+    apply (Qlt_trans q r (x0 * x2)) ; assumption.
+    split.
+    apply (Qlt_trans q r (x0 * x3)) ; assumption.
+    split.
+    apply (Qlt_trans q r (x1 * x2)) ; assumption.
+    apply (Qlt_trans q r (x1 * x3)) ; assumption.
   - admit.
   - admit.
   - admit.
