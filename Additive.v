@@ -119,8 +119,16 @@ Proof.
   - intro q ; split ; intro H.
     + destruct H as [s [r [G1 [[s' [r' [K1 [K2 K3]]]] G3]]]].
       exists s', (r + r')%Q ; split.
-      * admit.
-      * admit.
+      * assert(B:=Qplus_assoc s' r' r).
+        assert(C:=(Qplus_comm r r')).
+        rewrite C.
+        rewrite B.
+        rewrite G1.
+        apply Qplus_lt_l.
+        assumption.
+      * split.
+        assumption.
+        admit.
     + admit.
   - intro q ; split ; intro H.
     + admit.
