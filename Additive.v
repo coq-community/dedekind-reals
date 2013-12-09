@@ -179,5 +179,7 @@ Qed.
 
 Lemma Rplus_opp_l (x : R) : (- x) + x == 0.
 Proof.
-  admit. (* Use Rplus_comm here. *)
+  assert(A:=Rpluss_opp_r x).
+  rewrite Rplus_comm.
+  assumption.
 Qed.

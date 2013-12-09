@@ -54,14 +54,88 @@ Proof.
   apply Qmult_lt_compat_r; assumption.
 Qed.
 
+Lemma Qmult_opp_r : forall (a b : Q), - (a * b) == a * -b.
+Proof.
+  intros (a1, a2) (b1, b2).
+  unfold Qeq.
+  simpl.
+  ring.
+Qed.
+
+Lemma Qmult_opp_l : forall (a b : Q), - (a * b) == -a * b.
+Proof.
+  intros (a1, a2) (b1, b2).
+  unfold Qeq.
+  simpl.
+  ring.
+Qed.
+
 Lemma Qlt_mult_neg_r (q r s : Q) : s < 0 -> (q < r <-> r * s < q * s).
 Proof.
-  admit.
+  intro A.
+  split.
+  - intro B.
+    assert(C:=proj1 (Qlt_minus_iff s 0) A).
+    assert(D:=Qplus_0_l (-s)).
+    rewrite D in C.
+    assert(E:=Qmult_lt_compat_r q r (-s) C B).
+    apply Qopp_lt_compat.
+    rewrite (Qmult_opp_r q s).
+    rewrite (Qmult_opp_r r s).
+    assumption.
+  - intro B.
+    assert(G:=Qmult_opp_r r s).
+    assert(F:=Qmult_opp_r q s).
+    assert(C:=proj1 (Qlt_minus_iff s 0) A).
+    assert(D:=Qplus_0_l (-s)).
+    rewrite D in C.
+    clear D.
+    assert(H:=Qeq_sym (- (r * s)) (r * - s) G).
+    assert(D:=Qeq_sym (- (q * s)) (q * - s) F).
+    assert(E:=Qmult_lt_r q r (-s) C).
+    rewrite H in E.
+    rewrite D in E.
+    apply E.
+    apply Qopp_lt_compat.
+    rewrite (Qopp_involutive (r * s)).
+    rewrite (Qopp_involutive (q * s)).
+    assumption.
 Qed.
 
 Lemma Qlt_mult_neg_l (q r s : Q) : q < 0 -> (r < s <-> q * s < q * r).
 Proof.
-  admit.
+  intro A.
+  split.
+  - intro B.
+    assert(C:=proj1 (Qlt_minus_iff q 0) A).
+    assert(D:=Qplus_0_r (-q)).
+    assert(D1:=Qplus_comm (-q) 0).
+    rewrite D1 in D.
+    rewrite D in C.
+    assert(E:=Qmult_lt_compat_r r s (-q) C B).
+    apply Qopp_lt_compat.
+    rewrite (Qmult_comm q r).
+    rewrite (Qmult_comm q s).
+    rewrite (Qmult_opp_r r q).
+    rewrite (Qmult_opp_r s q).
+    assumption.
+  - intro B.
+    assert(G:=Qmult_opp_l q s).
+    assert(F:=Qmult_opp_l q r).
+    assert(C:=proj1 (Qlt_minus_iff q 0) A).
+    assert(D:=Qplus_0_l (-q)).
+    rewrite D in C.
+    clear D.
+    assert(H:=Qeq_sym (- (q * s)) (- q * s) G).
+    assert(D:=Qeq_sym (- (q * r)) ( -q * r) F).
+    assert(E:=Qmult_lt_l r s (-q) C).
+    rewrite H in E.
+    rewrite D in E.
+    apply E.
+    apply Qopp_lt_compat.
+    rewrite (Qopp_involutive (q * s)).
+    rewrite (Qopp_involutive (q * r)).
+    assumption.
 Qed.
 
 Lemma Qopp_lt_shift_l : forall (p q : Q), -p < q <-> -q < p.
@@ -202,7 +276,11 @@ Qed.
 
 Lemma Qmult_le_compat_l : forall x y z, y <= z -> 0 <= x -> x*y <= x*z.
 Proof.
-  admit.
+  intros x y z A B.
+  rewrite (Qmult_comm x y).
+  rewrite (Qmult_comm x z).
+  assert(C:=Qmult_le_compat_r y z x A B).
+  assumption.
 Qed.
 
 Lemma Qmult_le_compat : forall q r s t,
