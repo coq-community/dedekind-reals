@@ -17,11 +17,24 @@ Qed.
 
 Theorem Rlt_trans : forall (x y z : R), x < y -> y < z -> x < z.
 Proof.
-  admit.
+  intros x y z [q [Q1 Q2]] [r [R1 R2]].
+  unfold Rlt.
+  assert(A:=(lower_below_upper y q r Q2 R1)).
+  exists q.
+  split.
+  assumption.
+  assert(B:=(lower_lower z q r A R2)).
+  assumption.
 Qed.
 
 Theorem Rlt_linear : forall (x y z : R), x < y -> x < z \/ z < y.
 Proof.
+intros x y z [q [Q1 Q2]].
+unfold Rlt.
+left.
+exists q.
+split.
+assumption.
   admit.
 Qed.
 
@@ -68,7 +81,12 @@ Qed.
 
 Theorem Rlt_le_weak : forall (x y : R), x < y -> x <= y.
 Proof.
-  admit.
+  intros x y [q [Q1 Q2]].
+  unfold Rle.
+  intros s H.
+  assert(A:=(lower_below_upper x s q H Q1)).
+  assert(B:=(lower_lower y s q A Q2)).
+  assumption.
 Qed.
 
 Theorem Rnot_lt_le : forall (x y : R), ~ (x < y) <-> y <= x.
