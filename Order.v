@@ -29,12 +29,16 @@ Qed.
 
 Theorem Rneq_symm : forall x y : R, x ## y -> y ## x.
 Proof.
-  admit.
+  intros x y A.
+  unfold Rneq ; auto.
 Qed.
 
 Theorem Rneq_irrefl : forall x : R, x ## x -> Empty_set.
 Proof.
-  admit.
+intros x A.
+firstorder.
+- assert(B:= Rlt_irrefl x);firstorder.
+- assert(B:= Rlt_irrefl x);firstorder.
 Qed.
 
 Theorem Rnew_contrans : forall x y z : R, x ## y -> ((x ## z) + (y ## z))%type.
