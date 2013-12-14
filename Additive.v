@@ -30,18 +30,53 @@ Proof.
     destruct (lower_open y r G) as [r' [Lrr' G']].
     exists q', r' ; split ; auto.
     apply Qplus_lt_lt_compat ; assumption.
-  - admit. (* similar to previous case *)
+  - destruct (upper_bound x) as [q H].
+    destruct (upper_bound y) as [r G].
+    exists (q+r).
+    destruct (upper_open x q H) as [q' [Lqq' H']].
+    destruct (upper_open y r G) as [r' [Lrr' G']].
+    exists q', r';split; auto.
+    apply Qplus_lt_lt_compat ; assumption.
   - intros q r Lqr [r' [s' [H1 [H2 H3]]]].
     exists r', s' ; split ; auto.
     transitivity r ; assumption.
   - intros q [r [s [H1 [H2 H3]]]].
     exists ((q + r + s) * (1#2)) ; split.
-    + admit.
+    + cut (q <= (q+q)*(1#2)); intros.
+      cut ((q+q)*(1#2) < (q + r + s) * (1#2)).
+      apply (Qle_lt_trans q ((q + q) * (1 # 2)) ((q + r + s) * (1 # 2))).
+      assumption.
+      apply Qmult_lt_compat_r.
+      firstorder.
+      destruct (Qplus_lt_r q (r+s) q) .
+      setoid_replace (q+r+s) with ((q + (r+s))).
+      apply H4; assumption. 
+      ring_simplify. firstorder. 
+      ring_simplify;apply Qle_refl.
     + exists r, s ; split ; auto.
-      admit.
-  (* the next two cases are similar to the previous two cases. *)
-  - admit.
-  - admit.
+      setoid_replace (r+s) with ((r+s+r+s)*(1#2)).
+      apply Qmult_lt_compat_r. firstorder.
+      destruct (Qplus_lt_l q (r+s) (r+s)) .
+      setoid_replace (q+r+s) with (q+(r+s)); [idtac | ring]. 
+      setoid_replace (r+s+r+s) with (r+s+(r+s)); [auto | ring].
+      ring_simplify; ring. 
+  - intros q r Lqr [r' [s' [H1 [H2 H3]]]].
+    exists r', s'; split; auto.
+    transitivity q; assumption.
+  - intros q [r [s [H1 [H2 H3]]]].
+    exists ((q + r + s) * (1#2)) ; split.
+    +apply (Qlt_le_trans ((q + r + s) * (1 # 2)) ((q+q)*(1#2)) q). 
+     apply Qmult_lt_compat_r; [firstorder | idtac].
+     destruct (Qplus_lt_r (r+s) q q).
+     setoid_replace (q+r+s) with (q+(r+s)); [apply H0;assumption|idtac].
+     ring_simplify; apply Qeq_refl.
+     ring_simplify; apply Qle_refl.
+    + exists r, s ; split ; auto.
+      setoid_replace (r+s) with ((r+s+r+s)*(1#2)); [idtac|ring].
+      apply Qmult_lt_compat_r; [firstorder | idtac].
+      destruct (Qplus_lt_l (r+s) q (r+s)) .
+      setoid_replace (q+r+s) with (q+(r+s)); [idtac | ring]. 
+      setoid_replace (r+s+r+s) with (r+s+(r+s)); [auto | ring].
   - intros q [[r [s [H1 [H2 H3]]]] [r' [s' [G1 [G2 G3]]]]].
     apply (Qlt_irrefl q).
     transitivity (r + s) ; auto.
