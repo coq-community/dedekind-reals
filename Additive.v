@@ -83,16 +83,6 @@ Proof.
     transitivity (r' + s') ; auto.
     apply Qplus_lt_lt_compat ; [apply (lower_below_upper x) | apply (lower_below_upper y) ] ; auto.
   - intros q r Lqr.
-    assert ({lower x q} + {~lower x q}). admit.
-    destruct H.
-    + assert ({lower y q} + {~lower y q}). admit.
-      destruct H.
-      * left; exists q, q; split; auto.
-
-
-asset 
-    firstorder.
-    exfalso.
     admit.
 Defined.
 
