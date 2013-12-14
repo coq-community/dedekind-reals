@@ -4,7 +4,7 @@
 
 Require Import Morphisms Setoid SetoidClass.
 Require Import QArith.
-Require Import Cut.
+Require Import Cut Order.
 
 Local Open Scope R_scope.
 
@@ -29,9 +29,30 @@ Definition RCut_eq (c d : RCut) :=
 Instance RCut_Setoid : Setoid RCut := {| equiv := RCut_eq |}.
 Proof.
   split.
-  - admit.
-  - admit.
-  - admit.
+  - intro.
+    unfold RCut_eq.
+    split ; intro ; tauto.
+  - intro.
+    intros y H.
+    unfold RCut_eq.
+    destruct H.
+    split.
+    + intro x0.
+      apply iff_sym.
+      apply H.
+    + intro x0.
+      apply iff_sym.
+      apply H0.
+  - intro.
+    intros y z A B.
+    destruct A as [A1 A2].
+    destruct B as [B1 B2].
+    unfold RCut_eq.
+    split.
+    + intro.
+      eauto using iff_trans.
+    + intro.
+      eauto using iff_trans.
 Defined.
 
 (* Every real determines a real cut. *)
@@ -39,16 +60,89 @@ Definition RCut_of_R : R -> RCut.
 Proof.
   intro x.
   refine {| r_lower := (fun y => y < x) ; r_upper := (fun z => x < z) |}.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
+  - intro.
+    intros.
+    split.
+    + intro.
+      rewrite H in H0.
+      assumption.
+    + intro.
+      rewrite H.
+      assumption.
+  - intro.
+    intros.
+    split.
+    + intro.
+      rewrite H in H0.
+      assumption.
+    + intro.
+      rewrite H.
+      assumption.
+  - assert(H:=(lower_bound x)).
+    firstorder.
+    unfold Rlt.
+    exists x0.
+    assert (M:=(lower_open x x0 p)).
+    destruct M as [m [M1 M2]].
+    exists m.
+    split.
+    + auto using M1.
+    + assumption.
+  - assert(H:=(upper_bound x)).
+    firstorder.
+    unfold Rlt.
+    exists x0.
+    assert (M:=(upper_open x x0 p)).
+    destruct M as [m [M1 M2]].
+    exists m.
+    split.
+    + auto using M1.
+    + assumption.
+  - intros a b A B.
+    apply (Rlt_trans a b x A B).
+  - intros z [q [A B]].
+    unfold Rlt.
+    exists q.
+    split.
+    + destruct (upper_open z q A) as [r [S T]].
+      exists r.
+      split.
+      * assumption.
+      * auto using S.
+    + destruct (lower_open x q B) as [r [S T]].
+      exists r.
+      split.
+      * assumption.
+      * auto using S.
+  - intros a b A B.
+    apply (Rlt_trans x a b B A).
+  - intros y [q [H K]].
+    exists q.
+    unfold Rlt.
+    split.
+    + destruct (lower_open y q K) as [r [S T]].
+      exists r.
+      split.
+      * auto using S.
+      * assumption.
+    + destruct (upper_open x q H) as [r [S T]].
+      exists r.
+      split.
+      * auto using S.
+      * assumption.
+  - intro.
+    apply neg_false.
+    unfold Rlt.
+    split.
+    + intros [[q [P1 P2]] [r [S1 S2]]].
+      assert (H:=(lower_below_upper x q r P2 S1)).
+      assert (H1:=(lower_lower x0 q r H S2)).
+      auto using (disjoint x0 q).
+    + intro.
+      tauto.
+  - intros z y H.
+assert (H1:=(Rlt_linear z y x H)).
+admit.
 Defined.
 
 
