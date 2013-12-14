@@ -76,8 +76,7 @@ Proof.
   split.
   - intro B.
     assert(C:=proj1 (Qlt_minus_iff s 0) A).
-    assert(D:=Qplus_0_l (-s)).
-    rewrite D in C.
+    rewrite (Qplus_0_l (-s)) in C.
     assert(E:=Qmult_lt_compat_r q r (-s) C B).
     apply Qopp_lt_compat.
     rewrite (Qmult_opp_r q s).
@@ -87,9 +86,7 @@ Proof.
     assert(G:=Qmult_opp_r r s).
     assert(F:=Qmult_opp_r q s).
     assert(C:=proj1 (Qlt_minus_iff s 0) A).
-    assert(D:=Qplus_0_l (-s)).
-    rewrite D in C.
-    clear D.
+    rewrite (Qplus_0_l (-s)) in C.
     assert(H:=Qeq_sym (- (r * s)) (r * - s) G).
     assert(D:=Qeq_sym (- (q * s)) (q * - s) F).
     assert(E:=Qmult_lt_r q r (-s) C).
@@ -109,8 +106,7 @@ Proof.
   - intro B.
     assert(C:=proj1 (Qlt_minus_iff q 0) A).
     assert(D:=Qplus_0_r (-q)).
-    assert(D1:=Qplus_comm (-q) 0).
-    rewrite D1 in D.
+    rewrite (Qplus_comm (-q) 0) in D.
     rewrite D in C.
     assert(E:=Qmult_lt_compat_r r s (-q) C B).
     apply Qopp_lt_compat.
@@ -123,9 +119,7 @@ Proof.
     assert(G:=Qmult_opp_l q s).
     assert(F:=Qmult_opp_l q r).
     assert(C:=proj1 (Qlt_minus_iff q 0) A).
-    assert(D:=Qplus_0_l (-q)).
-    rewrite D in C.
-    clear D.
+    rewrite (Qplus_0_l (-q)) in C.
     assert(H:=Qeq_sym (- (q * s)) (- q * s) G).
     assert(D:=Qeq_sym (- (q * r)) ( -q * r) F).
     assert(E:=Qmult_lt_l r s (-q) C).
