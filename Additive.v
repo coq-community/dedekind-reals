@@ -42,20 +42,13 @@ Proof.
     transitivity r ; assumption.
   - intros q [r [s [H1 [H2 H3]]]].
     exists ((q + r + s) * (1#2)) ; split.
-    + cut (q <= (q+q)*(1#2)); intros.
-      cut ((q+q)*(1#2) < (q + r + s) * (1#2)).
-      apply (Qle_lt_trans q ((q + q) * (1 # 2)) ((q + r + s) * (1 # 2))).
-      assumption.
-      apply Qmult_lt_compat_r.
-      firstorder.
-      destruct (Qplus_lt_r q (r+s) q) .
-      setoid_replace (q+r+s) with ((q + (r+s))).
-      apply H4; assumption. 
-      ring_simplify. firstorder. 
-      ring_simplify;apply Qle_refl.
+    + apply (Qle_lt_trans q  ((q+q)*(1#2)) ((q + r + s) * (1 # 2))). 
+      ring_simplify; apply Qle_refl.
+      apply Qmult_lt_compat_r; [reflexivity | idtac].
+       apply (Qplus_lt_r _ _ (-q)); ring_simplify; assumption.
     + exists r, s ; split ; auto.
       setoid_replace (r+s) with ((r+s+r+s)*(1#2)).
-      apply Qmult_lt_compat_r. firstorder.
+      apply Qmult_lt_compat_r. reflexivity.
       destruct (Qplus_lt_l q (r+s) (r+s)) .
       setoid_replace (q+r+s) with (q+(r+s)); [idtac | ring]. 
       setoid_replace (r+s+r+s) with (r+s+(r+s)); [auto | ring].
@@ -66,17 +59,16 @@ Proof.
   - intros q [r [s [H1 [H2 H3]]]].
     exists ((q + r + s) * (1#2)) ; split.
     +apply (Qlt_le_trans ((q + r + s) * (1 # 2)) ((q+q)*(1#2)) q). 
-     apply Qmult_lt_compat_r; [firstorder | idtac].
+     apply Qmult_lt_compat_r; [reflexivity | idtac].
      destruct (Qplus_lt_r (r+s) q q).
      setoid_replace (q+r+s) with (q+(r+s)); [apply H0;assumption|idtac].
      ring_simplify; apply Qeq_refl.
      ring_simplify; apply Qle_refl.
     + exists r, s ; split ; auto.
       setoid_replace (r+s) with ((r+s+r+s)*(1#2)); [idtac|ring].
-      apply Qmult_lt_compat_r; [firstorder | idtac].
+      apply Qmult_lt_compat_r; [reflexivity | idtac].
       destruct (Qplus_lt_l (r+s) q (r+s)) .
-      setoid_replace (q+r+s) with (q+(r+s)); [idtac | ring]. 
-      setoid_replace (r+s+r+s) with (r+s+(r+s)); [auto | ring].
+      apply (Qplus_lt_r _ _ (-r-s)); ring_simplify; assumption.
   - intros q [[r [s [H1 [H2 H3]]]] [r' [s' [G1 [G2 G3]]]]].
     apply (Qlt_irrefl q).
     transitivity (r + s) ; auto.
@@ -151,7 +143,7 @@ Local Open Scope R_scope.
 Lemma Rplus_assoc (x y z : R) : (x + y) + z == x + (y + z).
 Proof.
   split.
-  - intro q ; split ; intro H.
+  - intro q; split ; intro H.
     + destruct H as [s [r [G1 [[s' [r' [K1 [K2 K3]]]] G3]]]].
       exists s', (r + r')%Q ; split.
       * rewrite (Qplus_comm r r').
@@ -159,13 +151,39 @@ Proof.
         rewrite G1.
         apply Qplus_lt_l.
         assumption.
-      * split.
-        assumption.
-        admit.
-    + admit.
+      * split; [assumption |idtac].
+        destruct (lower_open z r) as [t [H1 H2]]. assumption. 
+        exists r', t; split; auto.
+        rewrite (Qplus_comm r r').
+        apply Qplus_lt_r; auto.
+    + destruct H as [x' [yz' [H [Hx [y' [z' [H1 [Hy Hz]]]]]]]].
+      exists (x'+y')%Q, z'; split.
+      * apply (Qlt_trans q (x' + yz') (x' + y' + z')); [assumption |idtac].
+        apply (Qplus_lt_r _ _ (-x')); ring_simplify; assumption. 
+      * split; [idtac | assumption].
+        destruct (lower_open x x') as [t [G1 G2]]; [assumption |idtac].
+        exists t, y'; split; auto.
+        apply Qplus_lt_l; auto.
   - intro q ; split ; intro H.
-    + admit.
-    + admit.
+    + destruct H as [s [r [G1 [[s' [r' [K1 [K2 K3]]]] G3]]]].
+      exists s', (r + r')%Q ; split.
+      * rewrite (Qplus_comm r r').
+        rewrite (Qplus_assoc s' r' r).
+        apply (Qlt_trans (s'+r'+r) (s+r) q); [idtac|assumption].
+        apply Qplus_lt_l; assumption.
+      * split; [assumption |idtac].
+        destruct (upper_open z r) as [t [H1 H2]]; [assumption|idtac]. 
+        exists r', t; split; auto.
+        rewrite (Qplus_comm r r').
+        apply Qplus_lt_r; auto.
+    + destruct H as [x' [yz' [H [Hx [y' [z' [H1 [Hy Hz]]]]]]]].
+      exists (x'+y')%Q, z'; split.
+      * apply (Qlt_trans (x' + y' + z') (x' + yz') q); [idtac |assumption].
+        apply (Qplus_lt_r _ _ (-x')); ring_simplify; assumption. 
+      * split; [idtac | assumption].
+        destruct (upper_open x x') as [t [G1 G2]]; [assumption |idtac].
+        exists t, y'; split; auto.
+        apply Qplus_lt_l; auto. 
 Qed.
 
 Lemma Rplus_comm (x y : R) : x + y == y + x.
