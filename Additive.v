@@ -197,19 +197,47 @@ Proof.
   split ; intro q ; split.
   - intros [r [s [H1 [H2 H3]]]].
     apply (lower_lower x q s) ; auto.
-    admit. (* use the fact that r < 0 *)
+    transitivity (r+s)%Q;auto.
+    apply (Qplus_lt_r _ _ (-s)); ring_simplify.
+    apply H2.
   - intro H.
     destruct (lower_open x q H) as [r [G1 G2]].
     exists ((q - r) * (1#2))%Q, r ; split.
-    + admit.
+    + setoid_replace ((q - r) * (1 # 2) + r)%Q with ((q + r) * (1 # 2));[idtac|ring].
+      apply (Qle_lt_trans q ((q+q)*(1#2))_); [ring_simplify; apply Qle_refl| idtac ].
+      apply Qmult_lt_compat_r; [reflexivity | idtac].
+      apply Qplus_lt_r; assumption.
     + split ; auto.
-      admit. (* This just says (q - r) * (1#2) < 0 *)
-  - admit.
-  - admit.
+      cut ((q - r) * (1#2)<0)%Q;auto.
+      apply (Qplus_lt_r _ _ (r*(1#2))); ring_simplify.
+      setoid_replace ((1#2)*q) with (q*(1#2)); [idtac|ring].
+      setoid_replace ((1#2)*r) with (r*(1#2)); [idtac|ring].
+      apply Qmult_lt_compat_r; [reflexivity| assumption].
+  - intros [r [s [H1 [H2 H3]]]].
+    apply (upper_upper x s q) ; auto.
+    transitivity (r+s)%Q;auto.
+    apply (Qplus_lt_r _ _ (-s)); ring_simplify.
+    apply H2.
+  - intro H.
+    destruct (upper_open x q H) as [r [G1 G2]].
+    exists ((q - r) * (1#2))%Q, r ; split.
+    + setoid_replace ((q - r) * (1 # 2) + r)%Q with ((q + r) * (1 # 2));[idtac|ring].
+      apply (Qlt_le_trans _ ((q+q)*(1#2)) q); [idtac|ring_simplify; apply Qle_refl].
+      apply Qmult_lt_compat_r; [reflexivity | idtac].
+      apply Qplus_lt_r; assumption.
+    + split ; auto.
+      cut ((q - r) * (1#2)>0)%Q;auto.
+      apply (Qplus_lt_r _ _ (r*(1#2))); ring_simplify.
+      setoid_replace ((1#2)*q) with (q*(1#2)); [idtac|ring].
+      setoid_replace ((1#2)*r) with (r*(1#2)); [idtac|ring].
+      apply Qmult_lt_compat_r; [reflexivity| assumption].
 Qed.
 
 Lemma Rplus_0_r (x : R) : x + 0 == x.
-Admitted.
+Proof.
+  setoid_rewrite Rplus_comm.
+  apply Rplus_0_l.
+Qed.
 
 (** Properties of opposite. *)
 
