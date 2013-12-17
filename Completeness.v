@@ -145,23 +145,85 @@ assert (H1:=(Rlt_linear z y x H)).
 admit.
 Defined.
 
-
 Definition R_of_RCut : RCut -> R.
 Proof.
   intro c.
   refine {| lower := (fun q => exists x, r_lower c x /\ lower x q) ;
             upper := (fun q => exists y, r_upper c y /\ upper y q)
          |}.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
-  - admit.
+  - intro.
+    intros.
+    split.
+    + intro.
+      destruct H0.
+      exists x0.
+      rewrite H in H0.
+      assumption.
+    + intro.
+      destruct H0.
+      exists x0.
+      assert (H1:=Qeq_sym x y H).
+      rewrite H1 in H0.
+      assumption.
+  - intro.
+    intros.
+    split.
+    + intro.
+      destruct H0.
+      exists x0.
+      rewrite H in H0.
+      assumption.
+    + intro.
+      destruct H0.
+      exists x0.
+      assert (H1:=Qeq_sym x y H).
+      rewrite H1 in H0.
+      assumption.
+  - assert(H:=(r_lower_bound c)).
+    firstorder. (* should take less than 20 seconds *)
+    assert(B:=lower_bound x).
+    firstorder. (* should take less than 20 seconds *)
+  - assert(H:=(r_upper_bound c)).
+    firstorder. (* should take less than 20 seconds *)
+    assert(B:=upper_bound x).
+    firstorder. (* should take less than 20 seconds *)
+  - intros q r A [x[C D]].
+    exists x.
+    split.
+    + assumption.
+    + assert (J:=(lower_lower x q r A D)).
+      assumption.
+  - intros q [x[C D]].
+    assert(E:=(lower_open x q D)).
+    destruct E as [r [F G]].
+    exists r.
+    split.
+    + assumption.
+    + exists x.
+      split ; assumption.
+  - intros q r A [x[C D]].
+    exists x.
+    split.
+    + assumption.
+    + assert (J:=(upper_upper x q r A D)).
+      assumption.
+  - intros r [y[C D]].
+    assert(E:=(upper_open y r D)).
+    destruct E as [q [F G]].
+    exists q.
+    split.
+    + assumption.
+    + exists y.
+      split ; assumption.
+  - intro.
+    apply neg_false.
+    split.
+    + intros [ [x[X1 X2]] [y[Y1 Y2]] ].
+      admit.
+    + intro.
+      tauto.
+  - intros q r H.
+    admit.
 Defined.
 
 Theorem dedekind_complete :
