@@ -46,12 +46,9 @@ Proof.
   unfold Rneq ; auto.
 Qed.
 
-Theorem Rneq_irrefl : forall x : R, x ## x -> Empty_set.
+Theorem Rneq_irrefl : forall x : R, x ## x -> False.
 Proof.
-intros x A.
-firstorder.
-- assert(B:= Rlt_irrefl x);firstorder.
-- assert(B:= Rlt_irrefl x);firstorder.
+  intros x [A1|A2]; auto using (Rlt_irrefl x).
 Qed.
 
 Theorem Rnew_contrans : forall x y z : R, x ## y -> ((x ## z) + (y ## z))%type.

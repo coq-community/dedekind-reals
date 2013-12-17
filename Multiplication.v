@@ -44,24 +44,8 @@ Proof.
   - admit.
   - intros q r H K.
     unfold mult_lower.
-    destruct K.
-    firstorder.
-    exists x0, x1, x2, x3.
-    split.
-    assumption.
-    split.
-    assumption.
-    split.
-    assumption.
-    split.
-    assumption.
-    split.
-    apply (Qlt_trans q r (x0 * x2)) ; assumption.
-    split.
-    apply (Qlt_trans q r (x0 * x3)) ; assumption.
-    split.
-    apply (Qlt_trans q r (x1 * x2)) ; assumption.
-    apply (Qlt_trans q r (x1 * x3)) ; assumption.
+    destruct K as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
+    exists a, b, c, d ; repeat split ; try transitivity r ; auto.
   - admit.
   - admit.
   - admit.

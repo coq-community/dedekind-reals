@@ -78,26 +78,14 @@ Proof.
     + intro.
       rewrite H.
       assumption.
-  - assert(H:=(lower_bound x)).
-    firstorder.
-    unfold Rlt.
-    exists x0.
-    assert (M:=(lower_open x x0 p)).
-    destruct M as [m [M1 M2]].
-    exists m.
-    split.
-    + auto using M1.
-    + assumption.
-  - assert(H:=(upper_bound x)).
-    firstorder.
-    unfold Rlt.
-    exists x0.
-    assert (M:=(upper_open x x0 p)).
-    destruct M as [m [M1 M2]].
-    exists m.
-    split.
-    + auto using M1.
-    + assumption.
+  - destruct (lower_bound x) as [y P].
+    exists y.
+    destruct (lower_open x y P) as [m [M1 M2]].
+    exists m ; auto using M1.
+  - destruct (upper_bound x) as [y P].
+    exists y.
+    destruct (upper_open x y P) as [m [M1 M2]].
+    exists m ; auto using M1.
   - intros a b A B.
     apply (Rlt_trans a b x A B).
   - intros z [q [A B]].
@@ -179,14 +167,12 @@ Proof.
       assert (H1:=Qeq_sym x y H).
       rewrite H1 in H0.
       assumption.
-  - assert(H:=(r_lower_bound c)).
-    firstorder. (* should take less than 20 seconds *)
-    assert(B:=lower_bound x).
-    firstorder. (* should take less than 20 seconds *)
-  - assert(H:=(r_upper_bound c)).
-    firstorder. (* should take less than 20 seconds *)
-    assert(B:=upper_bound x).
-    firstorder. (* should take less than 20 seconds *)
+  - destruct (r_lower_bound c) as [x H].
+    destruct (lower_bound x) as [q P].
+    exists q, x ; auto.
+  - destruct (r_upper_bound c) as [x H].
+    destruct (upper_bound x) as [q P].
+    exists q, x ; auto.
   - intros q r A [x[C D]].
     exists x.
     split.
