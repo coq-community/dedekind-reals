@@ -15,7 +15,7 @@ Require Import Cut.
 Local Open Scope Q_scope.
 
 Definition straddle (x : R) (q : Qpositive) :=
-  { l : Q &  { u : Q & lower x l /\ upper x u /\ u - l < q } }.
+  exists l u : Q, lower x l /\ upper x u /\ u - l < q.
 
 Definition two_thirds (q : Qpositive) : Qpositive.
 Proof.

@@ -27,23 +27,29 @@ Proof.
   assumption.
 Qed.
 
+Theorem Rlt_asymm : forall x y : R, ~ (x < y /\ y < x).
+Proof.
+  intros x y [G H].
+  apply (Rlt_irrefl x).
+  apply (Rlt_trans x y x) ; assumption.
+Qed.
+
 Theorem Rlt_linear : forall (x y z : R), x < y -> x < z \/ z < y.
 Proof.
-intros x y z [q [Q1 Q2]].
-unfold Rlt.
-left.
-exists q.
-split.
-assumption.
-  admit.
+  intros x y z [q [Q1 Q2]].
+  destruct (upper_open x q Q1) as [s [S1 S2]].
+  destruct (located z s q S1) as [L|L].
+  - left ; exists s ; auto.
+  - right ; exists q ; auto.
 Qed.
 
 (* Properties of apartness ## *)
 
 Theorem Rneq_symm : forall x y : R, x ## y -> y ## x.
 Proof.
-  intros x y A.
-  unfold Rneq ; auto.
+  intros x y.
+  unfold Rneq ; intro A.
+  tauto.
 Qed.
 
 Theorem Rneq_irrefl : forall x : R, x ## x -> False.

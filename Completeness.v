@@ -1,6 +1,7 @@
 (* Dedekind completeness: any cut of real numbers determines a real.
    In other words, if we perform the Dedekind construction on R we just
-   get R back. *)
+   get R back. 
+*)
 
 Require Import Morphisms Setoid SetoidClass.
 Require Import QArith.
@@ -20,7 +21,7 @@ Structure RCut := {
   r_upper_upper : forall x y, x < y -> r_upper x -> r_upper y;
   r_upper_open : forall y, r_upper y -> exists x,  x < y /\ r_upper x;
   r_disjoint : forall x, ~ (r_lower x /\ r_upper x);
-  r_located : forall x y, x < y -> {r_lower x} + {r_upper y}
+  r_located : forall x y, x < y -> r_lower x \/ r_upper y
 }.
 
 Definition RCut_eq (c d : RCut) :=
@@ -60,24 +61,14 @@ Definition RCut_of_R : R -> RCut.
 Proof.
   intro x.
   refine {| r_lower := (fun y => y < x) ; r_upper := (fun z => x < z) |}.
-  - intro.
-    intros.
-    split.
-    + intro.
-      rewrite H in H0.
-      assumption.
-    + intro.
-      rewrite H.
-      assumption.
-  - intro.
-    intros.
-    split.
-    + intro.
-      rewrite H in H0.
-      assumption.
-    + intro.
-      rewrite H.
-      assumption.
+  - intros u v Euv.
+    split ; intro H.
+    + setoid_rewrite <- Euv ; assumption.
+    + setoid_rewrite -> Euv ; assumption.
+  - intros u v Euv.
+    split ; intro H.
+    + setoid_rewrite <- Euv ; assumption.
+    + setoid_rewrite -> Euv ; assumption.
   - destruct (lower_bound x) as [y P].
     exists y.
     destruct (lower_open x y P) as [m [M1 M2]].
@@ -89,48 +80,23 @@ Proof.
   - intros a b A B.
     apply (Rlt_trans a b x A B).
   - intros z [q [A B]].
-    unfold Rlt.
     exists q.
     split.
     + destruct (upper_open z q A) as [r [S T]].
-      exists r.
-      split.
-      * assumption.
-      * auto using S.
+      exists r ; auto.
     + destruct (lower_open x q B) as [r [S T]].
-      exists r.
-      split.
-      * assumption.
-      * auto using S.
+      exists r ; auto.
   - intros a b A B.
     apply (Rlt_trans x a b B A).
   - intros y [q [H K]].
     exists q.
-    unfold Rlt.
     split.
     + destruct (lower_open y q K) as [r [S T]].
-      exists r.
-      split.
-      * auto using S.
-      * assumption.
+      exists r ; auto.
     + destruct (upper_open x q H) as [r [S T]].
-      exists r.
-      split.
-      * auto using S.
-      * assumption.
-  - intro.
-    apply neg_false.
-    unfold Rlt.
-    split.
-    + intros [[q [P1 P2]] [r [S1 S2]]].
-      assert (H:=(lower_below_upper x q r P2 S1)).
-      assert (H1:=(lower_lower x0 q r H S2)).
-      auto using (disjoint x0 q).
-    + intro.
-      tauto.
-  - intros z y H.
-assert (H1:=(Rlt_linear z y x H)).
-admit.
+      exists r ; auto.
+  - auto using Rlt_asymm.
+  - auto using Rlt_linear.
 Defined.
 
 Definition R_of_RCut : RCut -> R.

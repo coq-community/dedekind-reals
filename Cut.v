@@ -28,11 +28,11 @@ Structure R := {
   (* The cuts are disjoint. *)
   disjoint : forall q, ~ (lower q /\ upper q);
   (* There is no gap between the cuts. *)
-  located : forall q r, q < r -> {lower q} + {upper r}
+  located : forall q r, q < r -> lower q \/ upper r
 }.
 
 (** Strict order. *)
-Definition Rlt (x y : R) := exists q, upper x q /\ lower y q.
+Definition Rlt (x y : R) := exists q : Q, upper x q /\ lower y q.
 
 (** Non-strict order. *)
 Definition Rle (x y : R) := forall q, lower x q -> lower y q.
@@ -58,7 +58,7 @@ Proof.
 Qed.
 
 (** Apartness. *)
-Definition Rneq (x y : R) := {Rlt x y} + {Rlt y x}.
+Definition Rneq (x y : R) := (Rlt x y + Rlt y x)%type.
 
 (** We introduce notation for equality, order and apartness. We put the notation
     in the scope [R_scope] which can then be opened whenever needed. *)
