@@ -58,7 +58,7 @@ Proof.
 Qed.
 
 (** Apartness. *)
-Definition Rneq (x y : R) := (Rlt x y + Rlt y x)%type.
+Definition Rneq (x y : R) := (Rlt x y \/ Rlt y x)%type.
 
 (** We introduce notation for equality, order and apartness. We put the notation
     in the scope [R_scope] which can then be opened whenever needed. *)

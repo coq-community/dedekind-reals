@@ -125,31 +125,14 @@ Qed.
 
 
 (* The inverse of a positive real. *)
-Definition Rinv_pos : forall x : R, (0 < x -> R)%R.
+Definition Rinv : forall x : R, (x ## 0 -> R)%R.
 Proof.
   intros x H.
   refine {|
-      lower := (fun q => exists r, upper x r /\ q * r < 1) ;
-      upper := (fun q => exists r, lower x r /\ 0 < r /\ 1 < q * r)
-    |}.
-  - admit.
-  - admit. 
-  - admit. 
-  - admit. 
-  - admit. 
-  - admit. 
-  - admit. 
-  - admit. 
-  - admit. 
-  - admit. 
-Defined.
-
-Definition Rinv_neg : forall x : R, (x < 0 -> R)%R.
-Proof.
-  intros x H.
-  refine {|
-      lower := (fun q => exists r, upper x r /\ r < 0 /\ 1 < q * r) ;
-      upper := (fun q => exists r, lower x r /\ q * r < 1)
+      lower := (fun q => (exists r, r < 0 /\ upper x r /\ 1 < q * r) \/
+                         (exists r, lower x 0 /\ upper x r /\ q * r < 1)) ;
+      upper := (fun q => (exists r, lower x r /\ upper x 0 /\ q * r < 1) \/
+                         (exists r, 0 < r /\ lower x r /\ 1 < q * r))
     |}.
   - admit.
   - admit. 
@@ -165,17 +148,11 @@ Defined.
 
 Theorem R_field : forall x : R, (x ## 0  -> { y | x * y == 1 })%R.
 Proof.
-  intros x [H|H].
-  - exists (Rinv_neg x H).
+  intros x H.
+  - exists (Rinv x H).
     split ; intro q ; split.
-    + intros [a [b [c [d [H1 [H2 [[r [R1 [R2 R3]]] [[s [S1 S2]] [H5 [H6 [H7 H8]]]]]]]]]]].
+    + intros [a [b [c [d [H1 [H2 [H3 [H4 [H5 [H6 [H7 H8]]]]]]]]]]].
       admit.
-    + admit.
-    + admit.
-    + admit.
-  - exists (Rinv_pos x H).
-    split ; intro q ; split.
-    + intros [a [b [c [d [H1 [H2 [[r [R1 R2]] [[s [S1 [S2 S3]]] [H5 [H6 [H7 H8]]]]]]]]]]].      
     + admit.
     + admit.
     + admit.
