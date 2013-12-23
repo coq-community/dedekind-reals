@@ -124,7 +124,7 @@ Proof.
 Qed.
 
 
-(* The inverse of a positive real. *)
+(* The inverse of a real which is apart from zero. *)
 Definition Rinv : forall x : R, (x ## 0 -> R)%R.
 Proof.
   intros x H.
@@ -146,19 +146,97 @@ Proof.
   - admit. 
 Defined.
 
+(*
+Theorem R_pos_field : forall x : R, (0 < x  -> { y | x * y == 1 })%R.
+Proof.
+  intros x H.
+  - exists (Rinv_pos x H).
+    split ; intro q ; split.
+    + intros [a [b [c [d [H1 [H2 [[r [R1 [R2 R3]]] [[s [S1 [S2 S3]]] [H5 [H6 [H7 H8]]]]]]]]]]].
+      simpl.
+      destruct (Qlt_le_dec 0 c) as [G|G].
+      * transitivity (a * c) ; auto.
+        transitivity (c * r) ; auto.
+        rewrite Qmult_comm.
+        apply Qmult_lt_l ; auto.
+        apply (lower_below_upper x) ; assumption.
+      * transitivity (b * c) ; auto.
+        apply (Qle_lt_trans _ 0) ; [idtac | reflexivity].
+        setoid_replace 0 with (b * 0) ; [ idtac | (symmetry ; apply Qmult_0_r)].
+        apply Qmult_le_compat_l ; auto.
+        apply Qlt_le_weak, (lower_below_upper x) ; auto.
+    + admit.
+    + admit.
+    + admit.
+Qed.
+*)
+
+Lemma Qmult_le_neg_pos_pos : forall q r, q <= 0 -> 0 <= r -> q * r <= 0.
+Proof.
+  intros q r H G.
+  setoid_replace 0 with (0 * r).
+  + now apply Qmult_le_compat_r.
+  + reflexivity.
+Qed.
+
 Theorem R_field : forall x : R, (x ## 0  -> { y | x * y == 1 })%R.
 Proof.
   intros x H.
-  - exists (Rinv x H).
-    split ; intro q ; split.
-    + intros [a [b [c [d [H1 [H2 [H3 [H4 [H5 [H6 [H7 H8]]]]]]]]]]].
-      admit.
-    + admit.
-    + admit.
-    + admit.
+  exists (Rinv x H).
+  split ; intro q ; split.
+  - intros [a [b [c [d [H1 [H2 [H3 [H4 [H5 [H6 [H7 H8]]]]]]]]]]].
+    simpl.
+    destruct H3 as [[r [R1 [R2 R3]]]|[r [R1 [R2 R3]]]] ;
+    destruct H4 as [[s [S1 [S2 S3]]]|[s [S1 [S2 S3]]]].
+    + destruct (Qlt_le_dec d 0) as [G|G].
+      * transitivity (b * d) ; auto.
+        transitivity (d * s) ; auto.
+        setoid_rewrite (Qmult_comm d s).
+        apply Qlt_mult_neg_r ; auto.
+        apply (lower_below_upper x) ; auto.
+      * transitivity (a * d); auto.
+        apply (Qle_lt_trans _ 0) ; [ idtac | reflexivity ].
+        apply Qmult_le_neg_pos_pos ; auto.
+        apply Qlt_le_weak, (lower_below_upper x) ; auto.
+    + exfalso.
+      apply (Qlt_irrefl 0), (lower_below_upper x).
+      * apply (lower_lower x 0 s) ; auto.
+      * apply (upper_upper x r 0) ; auto.
+   + exfalso.
+     apply (Qlt_irrefl 0), (lower_below_upper x) ; auto.
+   + destruct (Qlt_le_dec 0 c) as [G|G].
+     * transitivity (a * c) ; auto.
+       transitivity (c * r) ; auto.
+       setoid_rewrite (Qmult_comm c r).
+       apply Qmult_lt_compat_r ; auto.
+       apply (lower_below_upper x) ; auto.
+     * transitivity (b * c) ; auto.
+       apply (Qle_lt_trans _ 0) ; [ idtac | reflexivity ].
+       setoid_rewrite (Qmult_comm b c).
+       apply Qmult_le_neg_pos_pos ; auto.
+       apply Qlt_le_weak, (lower_below_upper x) ; auto.
+  - admit.
+  - admit.
+  - admit.
 Qed.
 
 Theorem R_inv_apart_0 : forall x : R, ({y | x * y == 1} -> x ## 0)%R.
 Proof.
-  admit.
+  intros x [y [F G]].
+  assert (H : 1#2 < 1) ; [ reflexivity | idtac ].
+  destruct ((proj2 (F (1#2)) H)) as [a [b [c [d [L1 [L2 [L3 [L4 [L5 [L6 [L7 L8]]]]]]]]]]].
+  destruct (Q_dec c 0) as [[?|?]|?].
+  - left ; exists b ; split ; auto.
+    simpl ; transitivity ((1 # 2) / c).
+    + admit.
+    + admit.
+  - right ; exists a ; split ; auto.
+    simpl. transitivity ((1 # 2) / c).
+    + admit.
+    + admit.
+  - absurd (1 # 2 < 0).
+    + discriminate.
+    + setoid_replace 0 with (a * c) ; auto.
+      setoid_rewrite q ; ring_simplify ; reflexivity.
 Qed.
+  
