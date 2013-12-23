@@ -4,6 +4,7 @@ Require Import Setoid Morphisms SetoidClass.
 Require Import MiscLemmas.
 Require Import QArith QOrderedType Qminmax Qabs.
 Require Import Cut.
+Require Import Archimedean.
 
 Local Open Scope Q_scope.
 
@@ -252,9 +253,13 @@ Proof.
   split ; intro q ; split ; intro H.
    - destruct H as [r [s [G1 [G2 G3]]]].
      apply (lower_lower 0 q (r + s)); auto.
-     admit.
+     apply (Qplus_lt_r _ _ (-s)); ring_simplify.
+     apply (lower_below_upper x); [assumption|auto].
   - admit.
-  - admit.
+  - destruct H as [r [s [G1 [G2 G3]]]].
+     apply (upper_upper 0 (r + s) q); auto.
+     apply (Qplus_lt_r _ _ (-s)); ring_simplify.
+     apply (lower_below_upper x); [assumption|auto]. 
   - admit.
 Qed.
 
