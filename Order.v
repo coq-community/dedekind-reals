@@ -57,10 +57,19 @@ Proof.
   intros x [A1|A2]; auto using (Rlt_irrefl x).
 Qed.
 
+Theorem Req_neq: forall x y:R, {x==y} + {x##y}.
+Admitted.
+
 Theorem Rnew_contrans : forall x y z : R, x ## y -> ((x ## z) + (y ## z))%type.
 Proof.
-  admit.
+  intros.
+  destruct (Req_neq x z).
+  - destruct r as [H1 H2].
+    right.
+    admit.  (*first order can solve this*)
+  - left; assumption.
 Qed.
+
 
 
 (* Properties of <= *)
@@ -72,12 +81,31 @@ Qed.
 
 Theorem Rle_trans : forall (x y z : R), x <= y -> y <= z -> x <= z.
 Proof.
-  admit.
+  unfold Rle.
+  intros.
+  apply H0.
+  apply H.
+  apply H1.
 Qed.
+
+Theorem R_covered: forall (x:R)(q:Q), {lower x q} + {upper x q}.
+Admitted.
 
 Theorem Rle_antisym : forall (x y : R), x <= y -> y <= x -> x == y.
 Proof.
-  admit.
+  unfold Rle.
+  intros.
+  unfold Req.
+  split.
+  - split; auto.
+  - split. 
+    + destruct (R_covered y q); [idtac|auto].
+      assert (lower x q); [auto using H0 | idtac].
+      assert (~(upper x q)); [ auto using (disjoint x q)|tauto].
+    + destruct (R_covered x q); [idtac|auto].
+      assert (lower y q); [auto using H0 | idtac].
+      assert (~(upper y q)); [ auto using (disjoint y q)|tauto].
+    
 Qed.
 
 (* Relationship between < and <=. *)
@@ -94,24 +122,49 @@ Qed.
 
 Theorem Rnot_lt_le : forall (x y : R), ~ (x < y) <-> y <= x.
 Proof.
-  admit.
+  intros.
+  split.
+  - unfold Rlt, Rle.
+    intros.
+    destruct (R_covered x q); [assumption|idtac].
+    destruct H.
+    exists q; split; assumption.
+  - unfold Rlt, Rle.
+    intros.
+    admit.
 Qed.
 
 Theorem Rlt_le_trans : forall (x y z : R), x < y -> y <= z -> x < z.
 Proof.
-  admit.
+  unfold Rlt, Rle.
+  intros.
+  destruct H as [q [H1 H2]].
+  exists q.
+  split; [assumption | auto using H0].
 Qed.
 
 Theorem Rle_lt_trans : forall (x y z : R), x <= y -> y < z -> x < z.
 Proof.
-  admit.
+  unfold Rlt, Rle.
+  intros.
+  destruct H0 as [q [H1 H2]].
+  exists q; split; [idtac|assumption].
+  destruct (R_covered x q); [idtac|assumption].
+  assert (lower y q); [auto using H|idtac].
+  exfalso. 
+  apply (disjoint y q).
+  split; assumption.
 Qed.
 
 (* Compatibility of < and <= with additive structure. *)
 
 Theorem R0_lt_1 : 0 < 1.
 Proof.
-  admit.
+  unfold Rlt.
+  exists (1#2)%Q.
+  split. 
+  assert (0<(1#2))%Q; [reflexivity | auto].
+  assert ((1#2)<1)%Q; [reflexivity | auto]. 
 Qed.
 
 Theorem Rplus_lt_compat_r : forall (x y z : R),  x < y <-> x + z < y + z.
