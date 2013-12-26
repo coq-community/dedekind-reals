@@ -1,3 +1,4 @@
+
 (* Dedekind completeness: any cut of real numbers determines a real.
    In other words, if we perform the Dedekind construction on R we just
    get R back. 
@@ -183,8 +184,12 @@ Theorem dedekind_complete :
 Proof.
   intro c.
   split ; intro x ; split ; intro H.
-  - admit.
-  - admit.
+  - destruct (r_lower_open c x H) as [y [[q [? ?]] ?]].
+    exists q ; split ; auto.
+    exists y ; auto.
+  - destruct H as [q [? [y [? ?]]]].
+    apply (r_lower_lower c x y) ; auto.
+    exists q ; split ; auto.
   - admit.
   - admit.
 Qed.
