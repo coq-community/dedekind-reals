@@ -80,7 +80,7 @@ endif
 #                    #
 ######################
 
-VFILES:= MiscLemmas.v Cut.v Additive.v Multiplication.v Order.v Completeness.v Archimedean.v
+VFILES:= MiscLemmas.v Cut.v Additive.v Multiplication.v Order.v MinMax.v Completeness.v Archimedean.v
 
 -include $(addsuffix .d,$(VFILES))
 .SECONDARY: $(addsuffix .d,$(VFILES))

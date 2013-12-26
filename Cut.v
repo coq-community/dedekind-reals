@@ -119,6 +119,24 @@ Proof.
     rewrite <- E3; assumption.
 Qed.
 
+(* The lower cut is closed for [Rle]. *)
+Lemma lower_le (x : R) (q r : Q) : lower x r -> (q <= r)%Q -> lower x q.
+Proof.
+  intros H G.
+  destruct (proj1 (Qle_lteq q r) G) as [E|E].
+  + apply (lower_lower x q r) ; assumption.
+  + rewrite E ; assumption.
+Qed.
+
+(* The upper cust is closed for [Rle]. *)
+Lemma upper_le (x : R) (q r : Q) : upper x q -> (q <= r)%Q -> upper x r.
+Proof.
+  intros H G.
+  destruct (proj1 (Qle_lteq q r) G) as [E|E].
+  + apply (upper_upper x q r) ; assumption.
+  + rewrite <- E ; assumption.
+Qed.
+
 (** Injection of rational numbers into reals. *)
 Definition R_of_Q : Q -> R.
 Proof.
