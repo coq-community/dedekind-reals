@@ -169,26 +169,39 @@ Qed.
 
 Theorem Rplus_lt_compat_r : forall (x y z : R),  x < y <-> x + z < y + z.
 Proof.
-  admit.
+  unfold Rlt.
+  split;intros;destruct H as [q [H1 H2]].
+  - admit.
+  - admit.
 Qed.
 
 Theorem Rplus_lt_compat_l : forall (x y z : R),  y < z <-> x + y < x + z.
 Proof.
-  admit.
+  intros.
+  setoid_replace (x+y) with (y+x); [idtac | apply (Rplus_comm x y)].
+  setoid_replace (x+z) with (z+x); [idtac | apply (Rplus_comm x z)].
+  apply (Rplus_lt_compat_r y z x).
 Qed.
 
 Theorem Rplus_le_compat_r : forall (x y z : R),  x <= y <-> x + z <= y + z.
 Proof.
-  admit.
+  unfold Rle.
+  split; intros.
+  - admit.
+  - admit.
 Qed.
 
 Theorem Rplus_le_compat_l : forall (x y z : R),  y <= z <-> x + y <= x + z.
-Proof.
+Proof.  
+  intros.
   admit.
 Qed.
 
 Theorem Rplus_positive : forall (x y : R), 0 < x + y -> 0 < x \/ 0 < y.
 Proof.
+  unfold Rlt.
+  intros.
+  destruct H as [q [H1 H2]].
   admit.
 Qed.
 
