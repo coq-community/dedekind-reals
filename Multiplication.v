@@ -40,15 +40,50 @@ Proof.
     |}.
   - apply mult_lower_proper.
   - apply mult_upper_proper.
-  - admit.
+  - destruct (lower_bound x) as [t P].
+destruct (lower_bound y) as [u S].
+destruct (upper_bound x) as [v K].
+destruct (upper_bound y) as [z M].
+exists (t*u).
+unfold mult_lower.
+destruct (lower_open x t P) as [t' [Ltt' H1]].
+destruct (lower_open y u S) as [u' [Luu' H2]].
+destruct (upper_open x v K) as [v' [Uvv' H3]].
+destruct (upper_open y z M) as [z' [Uzz' H4]].
+exists t',v',u',z' ; repeat split.
++ assumption.
++ assumption.
++ assumption.
++ assumption.
++ unfold Qlt.
+destruct t as (t1, t2).
+destruct t' as (t1', t2').
+destruct u as (u1, u2).
+destruct u' as (u1', u2').
+simpl.
+admit.
++ assert (A:=(lower_below_upper y u z' S H4)).
+admit.
++ assert (B:=(lower_below_upper x t v' P H3)).
+admit.
++ assert (A:=(lower_below_upper y u z' S H4)).
+assert (B:=(lower_below_upper x t v' P H3)).
+admit.
   - admit.
   - intros q r H K.
     unfold mult_lower.
     destruct K as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
     exists a, b, c, d ; repeat split ; try transitivity r ; auto.
-  - admit.
-  - admit.
-  - admit.
+  - intros q K.
+destruct K as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
+admit.
+  - intros r q H K.
+    unfold mult_upper.
+    destruct K as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
+    exists a, b, c, d ; repeat split ; try transitivity r ; auto.
+  - intros r H.
+destruct H as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
+admit.
   - admit.
   - admit.
 Defined.
