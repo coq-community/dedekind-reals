@@ -178,8 +178,8 @@ Qed.
 Theorem Rplus_lt_compat_l : forall (x y z : R),  y < z <-> x + y < x + z.
 Proof.
   intros.
-  setoid_replace (x+y) with (y+x); [idtac | apply (Rplus_comm x y)].
-  setoid_replace (x+z) with (z+x); [idtac | apply (Rplus_comm x z)].
+  rewrite (Rplus_comm x y).
+  rewrite (Rplus_comm x z).
   apply (Rplus_lt_compat_r y z x).
 Qed.
 
