@@ -170,7 +170,7 @@ Qed.
 Theorem Rplus_lt_compat_r : forall (x y z : R),  x < y <-> x + z < y + z.
 Proof.
   unfold Rlt.
-  split;intros;destruct H as [q [H1 H2]].
+  split ; intros [q [H1 H2]].
   - admit.
   - admit.
 Qed.
