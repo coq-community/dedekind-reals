@@ -37,9 +37,35 @@ Definition Rlt (x y : R) := exists q : Q, upper x q /\ lower y q.
 (** Non-strict order. *)
 Definition Rle (x y : R) := forall q, lower x q -> lower y q.
 
+(** Non-strict order in terms of upper cuts, and a proof they are
+    equivalent. *)
+
+Definition Rle_upper (x y : R) := forall q, upper y q -> upper x q.
+
+Lemma Rle_equiv (x y : R) : Rle x y <-> Rle_upper x y.
+Proof.
+  split.
+  - intros ? q Uyq.
+    destruct (upper_open y q Uyq) as [r [G ?]].
+    destruct (located x _ _ G) ; auto.
+    exfalso ; apply (disjoint y r) ; auto.
+  - intros ? q Lxq.
+    destruct (lower_open x q Lxq) as [r [G ?]].
+    destruct (located y _ _ G) ; auto.
+    exfalso ; apply (disjoint x r) ; auto.
+Qed.
+
 (** Equality. *)
-Definition Req (x y : R) :=
-  (forall q, lower x q <-> lower y q) /\ (forall q, upper x q <-> upper y q).
+Definition Req (x y : R) := Rle x y /\ Rle y x.
+
+(** Equality in terms of upper cuts, and a proof they are equivalent. *)
+Definition Req_upper (x y : R) := Rle_upper x y /\ Rle_upper y x.
+
+Lemma Req_equiv (x y : R) : Req x y <-> Req_upper x y.
+Proof.
+  unfold Req, Req_upper.
+  split ; intros [? ?] ; split ; apply Rle_equiv ; assumption.
+Qed.
 
 (** We explain to Coq how to derive automatically that [lower] and [upper].
     This way [lower] and [upper] will behave with respect to [setoid_rewrite]. *)
@@ -47,14 +73,17 @@ Instance R_lower_proper : Proper (Req ==> Qeq ==> iff) lower.
 Proof.
   intros x y [Exy1 Exy2] q r Eqr ; split ; intro H.
   - apply Exy1, (lower_proper x q r) ; assumption.
-  - apply Exy1, (lower_proper y q r) ; assumption.
+  - apply Exy2, (lower_proper y q r) ; assumption.
 Qed.
 
 Instance R_upper_proper : Proper (Req ==> Qeq ==> iff) upper.
 Proof.
-  intros x y [Exy1 Exy2] q r Eqr ; split ; intro H.
+  intros x y [Exy1 Exy2] q r Eqr.
+  apply Rle_equiv in Exy1.
+  apply Rle_equiv in Exy2.
+  split ; intro H.
   - apply Exy2, (upper_proper x q r) ; assumption.
-  - apply Exy2, (upper_proper y q r) ; assumption.
+  - apply Exy1, (upper_proper y q r) ; assumption.
 Qed.
 
 (** Apartness. *)
@@ -77,12 +106,11 @@ Local Open Scope R_scope.
 (** Equality on R is an equivalence relation. *)
 Instance Equivalence_Req : Equivalence Req.
 Proof.
-  unfold Req.
   split.
-  - intros x ; tauto.
+  - intros x ; split ; intro q ; tauto.
   - intros x y [H1 H2] ; split ; intro q.
-    + split; apply H1.
-    + split; apply H2.
+    + apply H2.
+    + apply H1.
   - intros x y z [G1 G2] [H1 H2].
     split ; intro q ;
     pose (H1' := H1 q) ; pose (H2' := H2 q) ;

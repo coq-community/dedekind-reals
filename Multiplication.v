@@ -93,9 +93,7 @@ Infix "*" := Rmult : R_scope.
 Instance Rmult_comp : Proper (Req ==> Req ==> Req) Rmult.
 Proof.
   intros x y Exy u v Euv.
-  split ; intro q ; split ; intros [a [b [c [d H]]]].
-  - exists a, b, c, d ; setoid_rewrite <- Exy ; setoid_rewrite <- Euv ; assumption.
-  - exists a, b, c, d ; setoid_rewrite -> Exy ; setoid_rewrite -> Euv ; assumption.
+  split ; intros q [a [b [c [d H]]]].
   - exists a, b, c, d ; setoid_rewrite <- Exy ; setoid_rewrite <- Euv ; assumption.
   - exists a, b, c, d ; setoid_rewrite -> Exy ; setoid_rewrite -> Euv ; assumption.
 Qed.
@@ -107,16 +105,14 @@ Admitted.
 
 Lemma Rmult_comm (x y : R) : (x * y == y * x)%R.
 Proof.
-  split ; intro q ; split ; intros [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
+  split ; intros q [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
   - exists c, d, a, b ; repeat split ; auto ; setoid_rewrite Qmult_comm; assumption.
-  - admit.
-  - admit.
   - admit.
 Qed.
  
 Lemma Rmult_1_l (x : R) : (1 * x == x)%R.
 Proof.
-  split ; intro q ; split.
+  split ; intro q.
   - intros [a [b [c [d [H1 [H2 [H3 [H4 [H5 [H6 [H7 H8]]]]]]]]]]].
     destruct (Q_dec c 0) as [[G|G]|G].
     + apply (lower_lower x q c) ; auto.
@@ -131,8 +127,6 @@ Proof.
       apply (lower_lower x q 0) ; auto.
       apply (Qlt_le_trans _ (a * 0)) ; auto.
       ring_simplify ; discriminate.
-  - admit.
-  - admit.
   - admit.
 Qed.
 
@@ -218,7 +212,7 @@ Theorem R_field : forall x : R, (x ## 0  -> { y | x * y == 1 })%R.
 Proof.
   intros x H.
   exists (Rinv x H).
-  split ; intro q ; split.
+  split ; intro q.
   - intros [a [b [c [d [H1 [H2 [H3 [H4 [H5 [H6 [H7 H8]]]]]]]]]]].
     simpl.
     destruct H3 as [[r [R1 [R2 R3]]]|[r [R1 [R2 R3]]]] ;
@@ -251,15 +245,13 @@ Proof.
        apply Qmult_le_neg_pos_pos ; auto.
        apply Qlt_le_weak, (lower_below_upper x) ; auto.
   - admit.
-  - admit.
-  - admit.
 Qed.
 
 Theorem R_inv_apart_0 : forall x : R, ({y | x * y == 1} -> x ## 0)%R.
 Proof.
   intros x [y [F G]].
   assert (H : 1#2 < 1) ; [ reflexivity | idtac ].
-  destruct ((proj2 (F (1#2)) H)) as [a [b [c [d [L1 [L2 [L3 [L4 [L5 [L6 [L7 L8]]]]]]]]]]].
+  destruct ((G (1#2)) H) as [a [b [c [d [L1 [L2 [L3 [L4 [L5 [L6 [L7 L8]]]]]]]]]]].
   destruct (Q_dec c 0) as [[?|?]|?].
   - left ; exists b ; split ; auto.
     simpl ; transitivity ((1 # 2) / c).

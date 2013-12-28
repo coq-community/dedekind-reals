@@ -88,24 +88,10 @@ Proof.
   apply H1.
 Qed.
 
-Theorem R_covered: forall (x:R)(q:Q), {lower x q} + {upper x q}.
-Admitted.
-
 Theorem Rle_antisym : forall (x y : R), x <= y -> y <= x -> x == y.
 Proof.
-  unfold Rle.
-  intros.
-  unfold Req.
-  split.
-  - split; auto.
-  - split. 
-    + destruct (R_covered y q); [idtac|auto].
-      assert (lower x q); [auto using H0 | idtac].
-      assert (~(upper x q)); [ auto using (disjoint x q)|tauto].
-    + destruct (R_covered x q); [idtac|auto].
-      assert (lower y q); [auto using H0 | idtac].
-      assert (~(upper y q)); [ auto using (disjoint y q)|tauto].
-    
+  intros x y H G.
+  split ; assumption.
 Qed.
 
 (* Relationship between < and <=. *)
@@ -113,47 +99,36 @@ Qed.
 Theorem Rlt_le_weak : forall (x y : R), x < y -> x <= y.
 Proof.
   intros x y [q [Q1 Q2]].
-  unfold Rle.
   intros s H.
-  assert(A:=(lower_below_upper x s q H Q1)).
-  assert(B:=(lower_lower y s q A Q2)).
-  assumption.
+  apply (lower_lower y s q) ; auto.
+  apply (lower_below_upper x) ; auto.
 Qed.
 
 Theorem Rnot_lt_le : forall (x y : R), ~ (x < y) <-> y <= x.
 Proof.
-  intros.
+  intros x y.
   split.
-  - unfold Rlt, Rle.
-    intros.
-    destruct (R_covered x q); [assumption|idtac].
-    destruct H.
-    exists q; split; assumption.
-  - unfold Rlt, Rle.
-    intros.
-    admit.
+  - intros H q G.
+    destruct (lower_open y q G) as [r [? ?]].
+    unfold Rlt in H.
+    destruct (located x q r) ; auto.
+    elim H.
+    exists r ; auto.
+  - admit.
 Qed.
 
 Theorem Rlt_le_trans : forall (x y z : R), x < y -> y <= z -> x < z.
 Proof.
-  unfold Rlt, Rle.
-  intros.
-  destruct H as [q [H1 H2]].
-  exists q.
-  split; [assumption | auto using H0].
+  intros x y z [q [? ?]] ?.
+  exists q ; auto.
 Qed.
 
 Theorem Rle_lt_trans : forall (x y z : R), x <= y -> y < z -> x < z.
 Proof.
-  unfold Rlt, Rle.
-  intros.
-  destruct H0 as [q [H1 H2]].
-  exists q; split; [idtac|assumption].
-  destruct (R_covered x q); [idtac|assumption].
-  assert (lower y q); [auto using H|idtac].
-  exfalso. 
-  apply (disjoint y q).
-  split; assumption.
+  intros x y z ? [q [? ?]].
+  exists q.
+  split ; auto.
+  apply Rle_equiv in H ; auto.
 Qed.
 
 (* Compatibility of < and <= with additive structure. *)

@@ -144,58 +144,37 @@ Local Open Scope R_scope.
 Lemma Rplus_assoc (x y z : R) : (x + y) + z == x + (y + z).
 Proof.
   split.
-  - intro q; split ; intro H.
-    + destruct H as [s [r [G1 [[s' [r' [K1 [K2 K3]]]] G3]]]].
-      exists s', (r + r')%Q ; split.
-      * rewrite (Qplus_comm r r').
-        rewrite (Qplus_assoc s' r' r).
-        rewrite G1.
-        apply Qplus_lt_l.
-        assumption.
-      * split; [assumption |idtac].
-        destruct (lower_open z r) as [t [H1 H2]]. assumption. 
-        exists r', t; split; auto.
-        rewrite (Qplus_comm r r').
-        apply Qplus_lt_r; auto.
-    + destruct H as [x' [yz' [H [Hx [y' [z' [H1 [Hy Hz]]]]]]]].
-      exists (x'+y')%Q, z'; split.
-      * apply (Qlt_trans q (x' + yz') (x' + y' + z')); [assumption |idtac].
-        apply (Qplus_lt_r _ _ (-x')); ring_simplify; assumption. 
-      * split; [idtac | assumption].
-        destruct (lower_open x x') as [t [G1 G2]]; [assumption |idtac].
-        exists t, y'; split; auto.
-        apply Qplus_lt_l; auto.
-  - intro q ; split ; intro H.
-    + destruct H as [s [r [G1 [[s' [r' [K1 [K2 K3]]]] G3]]]].
-      exists s', (r + r')%Q ; split.
-      * rewrite (Qplus_comm r r').
-        rewrite (Qplus_assoc s' r' r).
-        apply (Qlt_trans (s'+r'+r) (s+r) q); [idtac|assumption].
-        apply Qplus_lt_l; assumption.
-      * split; [assumption |idtac].
-        destruct (upper_open z r) as [t [H1 H2]]; [assumption|idtac]. 
-        exists r', t; split; auto.
-        rewrite (Qplus_comm r r').
-        apply Qplus_lt_r; auto.
-    + destruct H as [x' [yz' [H [Hx [y' [z' [H1 [Hy Hz]]]]]]]].
-      exists (x'+y')%Q, z'; split.
-      * apply (Qlt_trans (x' + y' + z') (x' + yz') q); [idtac |assumption].
-        apply (Qplus_lt_r _ _ (-x')); ring_simplify; assumption. 
-      * split; [idtac | assumption].
-        destruct (upper_open x x') as [t [G1 G2]]; [assumption |idtac].
-        exists t, y'; split; auto.
-        apply Qplus_lt_l; auto. 
+  - intros q [s [r [G1 [[s' [r' [K1 [K2 K3]]]] G3]]]].
+    exists s', (r + r')%Q ; split.
+    + rewrite (Qplus_comm r r').
+      rewrite (Qplus_assoc s' r' r).
+      rewrite G1.
+      apply Qplus_lt_l.
+      assumption.
+    + split ; auto.
+      destruct (lower_open z r) as [t [H1 H2]]. assumption. 
+      exists r', t; split; auto.
+      rewrite (Qplus_comm r r').
+      apply Qplus_lt_r; auto.
+  - intros q [x' [yz' [H [Hx [y' [z' [H1 [Hy Hz]]]]]]]].
+    exists (x' + y')%Q, z' ; split.
+    + transitivity (x' + yz')%Q ; auto.
+      apply (Qplus_lt_r _ _ (-x')); ring_simplify; assumption. 
+    + split ; auto.
+      destruct (lower_open x x') as [t [G1 G2]] ; auto.
+      exists t, y'; split; auto.
+      apply Qplus_lt_l; auto.
 Qed.
 
 Lemma Rplus_comm (x y : R) : x + y == y + x.
 Proof.
-  split ; intro q ; split ; intros [r [s [G1 [G2 G3]]]] ; exists s, r ; split ; auto ;
+  split ; intros q [r [s [G1 [G2 G3]]]] ; exists s, r ; split ; auto ;
   setoid_rewrite (Qplus_comm s r) ; assumption.
 Qed.
 
 Lemma Rplus_0_l (x : R) : 0 + x == x.
 Proof.
-  split ; intro q ; split.
+  split ; intros q.
   - intros [r [s [H1 [H2 H3]]]].
     apply (lower_lower x q s) ; auto.
     transitivity (r+s)%Q;auto.
@@ -214,24 +193,6 @@ Proof.
       setoid_replace ((1#2)*q) with (q*(1#2)); [idtac|ring].
       setoid_replace ((1#2)*r) with (r*(1#2)); [idtac|ring].
       apply Qmult_lt_compat_r; [reflexivity| assumption].
-  - intros [r [s [H1 [H2 H3]]]].
-    apply (upper_upper x s q) ; auto.
-    transitivity (r+s)%Q;auto.
-    apply (Qplus_lt_r _ _ (-s)); ring_simplify.
-    apply H2.
-  - intro H.
-    destruct (upper_open x q H) as [r [G1 G2]].
-    exists ((q - r) * (1#2))%Q, r ; split.
-    + setoid_replace ((q - r) * (1 # 2) + r)%Q with ((q + r) * (1 # 2));[idtac|ring].
-      apply (Qlt_le_trans _ ((q+q)*(1#2)) q); [idtac|ring_simplify; apply Qle_refl].
-      apply Qmult_lt_compat_r; [reflexivity | idtac].
-      apply Qplus_lt_r; assumption.
-    + split ; auto.
-      cut ((q - r) * (1#2)>0)%Q;auto.
-      apply (Qplus_lt_r _ _ (r*(1#2))); ring_simplify.
-      setoid_replace ((1#2)*q) with (q*(1#2)); [idtac|ring].
-      setoid_replace ((1#2)*r) with (r*(1#2)); [idtac|ring].
-      apply Qmult_lt_compat_r; [reflexivity| assumption].
 Qed.
 
 Lemma Rplus_0_r (x : R) : x + 0 == x.
@@ -244,28 +205,22 @@ Qed.
 
 Lemma Ropp_involutive (x : R) : - (- x) == x.
 Proof.
-  split ; intro q ; split ; intro H ; simpl in * |- * ;
+  split ; intros q H ; simpl in * |- * ;
   rewrite Qopp_opp in * |- * ; assumption.
 Qed.
 
 Lemma Rpluss_opp_r (x : R) : x + (- x) == 0.
 Proof.
-  split ; intro q ; split ; intro H.
+  split ; intros q H.
    - destruct H as [r [s [G1 [G2 G3]]]].
      apply (lower_lower 0 q (r + s)); auto.
      apply (Qplus_lt_r _ _ (-s)); ring_simplify.
      apply (lower_below_upper x); [assumption|auto].
   - admit.
-  - destruct H as [r [s [G1 [G2 G3]]]].
-     apply (upper_upper 0 (r + s) q); auto.
-     apply (Qplus_lt_r _ _ (-s)); ring_simplify.
-     apply (lower_below_upper x); [assumption|auto]. 
-  - admit.
 Qed.
 
 Lemma Rplus_opp_l (x : R) : (- x) + x == 0.
 Proof.
-  assert(A:=Rpluss_opp_r x).
   rewrite Rplus_comm.
-  assumption.
+  apply Rpluss_opp_r.
 Qed.
