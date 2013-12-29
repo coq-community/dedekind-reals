@@ -172,7 +172,9 @@ Proof.
     apply neg_false.
     split.
     + intros [ [x[X1 X2]] [y[Y1 Y2]] ].
-      admit.
+assert (T:=(disjoint x q)).
+firstorder.
+admit.
     + intro.
       tauto.
   - intros q r H.
@@ -190,6 +192,13 @@ Proof.
   - destruct H as [q [? [y [? ?]]]].
     apply (r_lower_lower c x y) ; auto.
     exists q ; split ; auto.
-  - admit.
-  - admit.
+  - destruct (r_upper_open c x H) as [y [[q [? ?]] ?]].
+    exists q ; split ; auto.
+    exists y ; auto.
+  - destruct H.
+    destruct H.
+    destruct H.
+    destruct H.
+    apply (r_upper_upper c x1 x) ; auto.
+    exists x0 ; split ; auto.
 Qed.
