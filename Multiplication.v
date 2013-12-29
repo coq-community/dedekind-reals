@@ -107,7 +107,7 @@ Lemma Rmult_comm (x y : R) : (x * y == y * x)%R.
 Proof.
   split ; intros q [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
   - exists c, d, a, b ; repeat split ; auto ; setoid_rewrite Qmult_comm; assumption.
-  - admit.
+  - exists c, d, a, b ; repeat split ; auto ; setoid_rewrite Qmult_comm; assumption.
 Qed.
  
 Lemma Rmult_1_l (x : R) : (1 * x == x)%R.
@@ -132,8 +132,9 @@ Qed.
 
 Lemma Rmult_1_r (x : R) : (x * 1 == x)%R.
 Proof.
-  (* Use Rmult_comm and Rmult_1_l. *)
-  admit.
+  assert(H:= (Rmult_comm x 1)).
+  rewrite H.
+  apply Rmult_1_l.
 Qed.
 
 (* Distributivity *)
