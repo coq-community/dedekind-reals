@@ -216,7 +216,11 @@ Proof.
      apply (lower_lower 0 q (r + s)); auto.
      apply (Qplus_lt_r _ _ (-s)); ring_simplify.
      apply (lower_below_upper x); [assumption|auto].
-  - admit.
+  - assert (-q>0)%Q; [apply (Qplus_lt_r _ _ q) ;ring_simplify; auto | idtac].  
+    destruct (archimedean x (existT _ (-q)%Q H0)) as [a [b [A [B C]]]]. 
+    exists a, (-b)%Q; split; [idtac | split; auto].
+    apply (Qplus_lt_r _ _ (b-a-q)%Q) ;ring_simplify; auto.
+    cut (upper x (--b)); [auto | rewrite Qopp_involutive; auto].
 Qed.
 
 Lemma Rplus_opp_l (x : R) : (- x) + x == 0.
