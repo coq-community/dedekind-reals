@@ -4,7 +4,7 @@ Require Import Setoid Morphisms.
 Require Import QArith.
 Require Import Qminmax.
 
-Require Import Cut MiscLemmas Order.
+Require Import Cut MiscLemmas Additive Multiplication Order.
 
 Local Open Scope R_scope.
 
@@ -191,16 +191,14 @@ Qed.
 
 Theorem Rmin_idempotent (x : R) : Rmin x x == x.
 Proof.
-  assert (H:=(Rmin_lower_l x x)).
-  assert (K:=proj2 (Rmin_spec x x x)).
-  firstorder.
+  split.
+  - apply Rmin_lower_l.
+  - apply Rmin_spec ; split ; apply Rle_refl.
 Qed.
 
 Theorem Rmin_comm (x y : R) : Rmin x y == Rmin y x.
 Proof.
-  destruct (proj1 (Rmin_spec x y (Rmin x y)) (Rle_refl _)).
-  destruct (proj1 (Rmin_spec y x (Rmin y x)) (Rle_refl _)).
-  firstorder.
+  split ; apply Rmin_spec ; auto using Rmin_lower_l, Rmin_lower_r.
 Qed.
 
 Theorem Rmin_assoc (x y z : R) : Rmin x (Rmin y z) == Rmin (Rmin x y) z.
@@ -215,29 +213,83 @@ Qed.
 
 Theorem Rmax_upper_l (x y : R) : x <= Rmax x y.
 Proof.
-  destruct (proj1 (Rmax_spec x y (Rmax x y)) (Rle_refl _)) ; assumption.
+  apply (Rmax_spec x y  (Rmax x y)), Rle_refl.
 Qed.
 
-Theorem Rmax_upper_r (x y : R) : y <= Rmax x y. (* Tu je bilo prej Rmax_lower_r /.../ y <= Rmin x y.*)
+Theorem Rmax_upper_r (x y : R) : y <= Rmax x y.
 Proof.
-  destruct (proj1 (Rmax_spec x y (Rmax x y)) (Rle_refl _)) ; assumption.
+  apply (Rmax_spec x y (Rmax x y)), Rle_refl.
 Qed.
 
 Theorem Rmax_idempotent (x : R) : Rmax x x == x.
 Proof.
-  assert (H:=(Rmax_upper_l x x)).
-  assert (K:=proj2 (Rmax_spec x x x)).
-  firstorder.
+  split.
+  - apply (Rmax_spec x x x) ; split ; apply Rle_refl.
+  - apply Rmax_upper_l.
 Qed.
 
 Theorem Rmax_comm (x y : R) : Rmax x y == Rmax y x.
 Proof.
-  destruct (proj1 (Rmax_spec x y (Rmax x y)) (Rle_refl _)).
-  destruct (proj1 (Rmax_spec y x (Rmax y x)) (Rle_refl _)).
-  admit. (* Zakaj tu firstorder odpove, pri Rmin_comm pa deluje? *)
+  split ; apply Rmax_spec ; auto using Rmax_upper_l, Rmax_upper_r.
 Qed.
 
 Theorem Rmax_assoc (x y z : R) : Rmax x (Rmax y z) == Rmax (Rmax x y) z.
+Proof.
+  admit.
+Qed.
+
+(* Distributivity of + over min and max. *)
+
+Theorem Rmin_plus_distr_r (x y z : R) : Rmin (x + z) (y + z) == Rmin x y + z.
+Proof.
+  admit.
+Qed.
+
+Theorem Rmin_plus_distr_l (x y z : R) : Rmin (x + y) (x + z) == x + Rmin y z.
+Proof.
+  admit.
+Qed.
+
+Theorem Rmax_plus_distr_r (x y z : R) : Rmax (x + z) (y + z) == Rmax x y + z.
+Proof.
+  admit.
+Qed.
+
+Theorem Rmax_plus_distr_l (x y z : R) : Rmax (x + y) (x + z) == x + Rmax y z.
+Proof.
+  admit.
+Qed.
+
+(* Distributivity of * over min and max. *)
+
+Theorem Rmin_mult_distr_r (x y z : R) : 0 < z -> Rmin (x * z) (y * z) == Rmin x y * z.
+Proof.
+  admit.
+Qed.
+
+Theorem Rmin_mult_distr_l (x y z : R) : 0 < x -> Rmin (x * y) (x * z) == x * Rmin y z.
+Proof.
+  admit.
+Qed.
+
+Theorem Rmax_mult_distr_r (x y z : R) : 0 < z -> Rmax (x * z) (y * z) == Rmax x y * z.
+Proof.
+  admit.
+Qed.
+
+Theorem Rmax_mult_distr_l (x y z : R) : 0 < x -> Rmax (x * y) (x * z) == x * Rmax y z.
+Proof.
+  admit.
+Qed.
+
+(* Opposite in relation to min and max. *)
+
+Theorem Ropp_min (x y : R) : Rmin (-x) (-y) == - (Rmax x y).
+Proof.
+  admit.
+Qed.
+
+Theorem Ropp_max (x y : R) : Rmax (-x) (-y) == - (Rmin x y).
 Proof.
   admit.
 Qed.
