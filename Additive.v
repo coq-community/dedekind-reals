@@ -75,8 +75,7 @@ Proof.
     transitivity (r + s) ; auto.
     transitivity (r' + s') ; auto.
     apply Qplus_lt_lt_compat ; [apply (lower_below_upper x) | apply (lower_below_upper y) ] ; auto.
-  - intros q r Lqr.
-    admit.
+  - admit. (* I think we need to use archimedean here. *)
 Defined.
 
 (** Opposite value. *)
@@ -131,13 +130,20 @@ Infix "-" := Rminus : R_scope.
 (** The arithmetical operations are proper with respect to equality. *)
 
 Instance Rplus_comp : Proper (Req ==> Req ==> Req) Rplus.
-Admitted.
+Proof.
+  intros x y Exy u v Euv.
+  split ; intros q [s [r ?]].
+  - exists s, r. setoid_rewrite <- Exy ; setoid_rewrite <- Euv ; auto.
+  - exists s, r. setoid_rewrite -> Exy ; setoid_rewrite -> Euv ; auto.
+Qed.
 
 Instance Ropp_comp : Proper (Req ==> Req) Ropp.
-Admitted.
+Proof.
+  intros x y E.
+  split ; intro q ; simpl ; rewrite E ; auto.
+Qed.
 
 Local Open Scope R_scope.
-
 
 (** Properties of addition. *)
 
@@ -218,7 +224,7 @@ Proof.
      apply (lower_below_upper x); [assumption|auto].
   - assert (G : (-q > 0)%Q).
     + apply (Qplus_lt_r _ _ q) ; ring_simplify ; auto.
-    + destruct (archimedean x (existT _ (-q)%Q G)) as [a [b [A [B C]]]]. 
+    + destruct (archimedean x _ G) as [a [b [A [B C]]]]. 
       exists a, (-b)%Q; repeat split; auto.
       apply (Qplus_lt_r _ _ (b-a-q)%Q) ; ring_simplify ; auto.
       cut (upper x (--b)) ; auto.

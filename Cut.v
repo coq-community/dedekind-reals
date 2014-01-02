@@ -134,6 +134,13 @@ Proof.
     + rewrite -> Ezw ; assumption.
 Qed.
   
+Instance Rle_proper : Proper (Req ==> Req ==> iff) Rle.
+Proof.
+  intros x y Exy z w Ezw ; split ; intros H g.
+  - setoid_rewrite <- Exy ; setoid_rewrite <- Ezw ; apply H.
+  - setoid_rewrite -> Exy ; setoid_rewrite -> Ezw ; apply H.
+Qed.
+
 (* A lower bound is smaller than an upper bound. *)
 Lemma lower_below_upper (x : R) (q r : Q) : lower x q -> upper x r -> (q < r)%Q.
 Proof.
@@ -156,7 +163,7 @@ Proof.
   + rewrite E ; assumption.
 Qed.
 
-(* The upper cust is closed for [Rle]. *)
+(* The upper cut is closed for [Rle]. *)
 Lemma upper_le (x : R) (q r : Q) : upper x q -> (q <= r)%Q -> upper x r.
 Proof.
   intros H G.

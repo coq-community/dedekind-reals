@@ -19,14 +19,6 @@ Notation "A ^^ n" := (power1 n A) (at level 8, left associativity) : type_scope.
 
 Local Open Scope Q_scope.
 
-Definition Qpositive := {q : Q | q > 0}.
-
-Coercion Q_of_Qpositive (u : Qpositive) := projT1 u.
-
-Definition Qnonnegative := {q : Q | q >= 0}.
-
-Coercion Q_of_Qnonnegative (q : Qnonnegative) := projT1 q.
-
 Lemma Qeq_le (p q : Q) : p == q -> p <= q.
 Proof.
   intro E.
