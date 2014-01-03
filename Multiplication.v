@@ -44,12 +44,36 @@ Proof.
     destruct (lower_bound y) as [u S].
     destruct (upper_bound x) as [v K].
     destruct (upper_bound y) as [z M].
-exists (Qmin (Qmin (t*u) (v*z)) (Qmin (t*z) (v*u))).
-    destruct (lower_open x t P) as [t' [Ltt' T1]].
-    destruct (lower_open y u S) as [u' [Luu' T2]].
-    destruct (upper_open x v K) as [v' [Uvv' T3]].
-    destruct (upper_open y z M) as [z' [Uzz' T4]].
+exists ((Qmin (Qmin (t*u) (t*z)) (Qmin (v*z) (v*u)))-1).
 unfold mult_lower.
+exists t,v,u,z ; repeat split.
++ assumption.
++ assumption.
++ assumption.
++ assumption.
++ destruct (Q.min_spec (Qmin (t * u) (t * z)) (Qmin (v * z) (v * u))) as [[G1 H1]|[G1 H1]].
+destruct (Q.min_spec (t * u) (t * z)) as [[G2 H2]|[G2 H2]].
+destruct (Q.min_spec (v * z) (v * u)) as [[G3 H3]|[G3 H3]].
+* setoid_rewrite H1.
+setoid_rewrite H2.
+apply (Qlt_minus_1 (t*u)).
+* setoid_rewrite H1.
+setoid_rewrite H2.
+apply (Qlt_minus_1 (t*u)).
+* setoid_rewrite H1.
+setoid_rewrite H2.
+assert (W:=(Qlt_minus_1 (t*z))).
+assert (E:=(Qlt_le_trans (t*z+(-1#1)) (t*z) (t*u) W G2)).
+auto.
+* setoid_rewrite H1.
+destruct (Q.min_spec (v * z) (v * u)) as [[G3 H3]|[G3 H3]].
+setoid_rewrite H3.
+destruct (Q.min_spec (v * z) (t * u)) as [[G4 H4]|[G4 H4]].
+assert (W:=(Qlt_minus_1 (v*z))).
+assert (V:=(Qlt_trans (v*z+(-1#1)) (v*z) (t*u) W G4)).
+assumption.
+auto.
+admit.
 admit.
   - admit.
   - intros q r H K.
