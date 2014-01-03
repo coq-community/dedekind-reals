@@ -170,13 +170,23 @@ Qed.
 
 Theorem Rmin_spec (x y z : R) : z <= Rmin x y <-> z <= x /\ z <= y.
 Proof.
+unfold Rle.
 split.
 - intro.
 split.
-+ admit.
-+ admit.
++ intros q A.
+assert (C:=(H q A)).
+destruct C.
+assumption.
++ intros q A.
+assert (C:=(H q A)).
+destruct C.
+assumption.
 - intros [H1 H2].
-admit.
+intros q A.
+assert (C1:=(H1 q A)).
+assert (C2:=(H2 q A)).
+firstorder.
 Qed.
 
 Theorem Rmin_lower_l (x y : R) : Rmin x y <= x.
@@ -203,12 +213,26 @@ Qed.
 
 Theorem Rmin_assoc (x y z : R) : Rmin x (Rmin y z) == Rmin (Rmin x y) z.
 Proof.
-  admit.
+  firstorder.
 Qed.
 
 Theorem Rmax_spec (x y z : R) : Rmax x y <= z <-> x <= z /\ y <= z.
 Proof.
-  admit.
+unfold Rle.
+split.
+- intro.
+split.
++ intros q A.
+assert (C:=(H q)).
+admit.
++ intros q A.
+assert (C:=(H q)).
+admit.
+- intros [H1 H2].
+intros q A.
+assert (C1:=(H1 q)).
+assert (C2:=(H2 q)).
+admit.
 Qed.
 
 Theorem Rmax_upper_l (x y : R) : x <= Rmax x y.
@@ -235,7 +259,30 @@ Qed.
 
 Theorem Rmax_assoc (x y z : R) : Rmax x (Rmax y z) == Rmax (Rmax x y) z.
 Proof.
-  admit.
+  split.
+  - apply Rmax_spec.
+    split.
+    + assert(A:=(Rmax_upper_l x y)).
+      assert(B:=(Rmax_upper_l (Rmax x y) z)).
+      assert(C:=(Rle_trans x (Rmax x y) (Rmax (Rmax x y) z) A B)).
+      assumption.
+    + apply Rmax_spec ; split.
+      * assert(A:=(Rmax_upper_r x y)).
+        assert(B:=(Rmax_upper_l (Rmax x y) z)).
+        assert(C:=(Rle_trans y (Rmax x y) (Rmax (Rmax x y) z) A B)).
+        assumption.
+      * assert(A:=(Rmax_upper_r (Rmax x y) z)) ; assumption.
+  - apply Rmax_spec ; split.
+    + apply Rmax_spec ; split.
+      * assert(A:=(Rmax_upper_l x (Rmax y z))) ; assumption.
+      * assert(A:=(Rmax_upper_l y z)).
+        assert(B:=(Rmax_upper_r x (Rmax y z))).
+        assert(C:=(Rle_trans y (Rmax y z) (Rmax x (Rmax y z) ) A B)).
+        assumption.
+    + assert(A:=(Rmax_upper_r y z)).
+      assert(B:=(Rmax_upper_r x (Rmax y z))).
+      assert(C:=(Rle_trans z (Rmax y z) (Rmax x (Rmax y z)) A B)).
+      assumption.
 Qed.
 
 (* Distributivity of + over min and max. *)
