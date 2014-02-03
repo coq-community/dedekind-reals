@@ -75,6 +75,9 @@ assumption.
 auto.
 admit.
 admit.
++ admit.
++ admit.
++ admit.
   - admit.
   - intros q r H K.
     unfold mult_lower.
