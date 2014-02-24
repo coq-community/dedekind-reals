@@ -75,7 +75,36 @@ Proof.
     transitivity (r + s) ; auto.
     transitivity (r' + s') ; auto.
     apply Qplus_lt_lt_compat ; [apply (lower_below_upper x) | apply (lower_below_upper y) ] ; auto.
-  - admit. (* I think we need to use archimedean here. *)
+  - intros q r H.
+    assert (G : ((r-q)*(1 # 2) > 0)%Q).
+    apply (Qmult_lt_r _ _ (2#1)); [reflexivity|ring_simplify].
+    apply (Qplus_lt_r _ _ q); ring_simplify; assumption.
+    destruct (archimedean x _ G) as [xL [xU [xA [xB xC]]]].
+    destruct (archimedean y _ G) as [yL [yU [yA [yB yC]]]].
+    destruct (Qlt_le_dec (xL+yL) r) as [E1 | E2].
+    + destruct (Qlt_le_dec (xU+yU) r) as [F1 | F2].
+      * right.
+        exists xU, yU; auto.
+      * {
+        left.
+        exists xL, yL; split; auto.
+        assert (r-xL-yL<r-q).
+          -setoid_replace (r-q) with ((r-q)*(1#2) + (r-q)*(1#2));[idtac|ring].
+           apply (Qlt_trans (r-xL-yL) ((r-q)*(1#2)+yU-yL) ((r-q)*(1#2)+(r-q)*(1#2))).    
+           + apply (Qle_lt_trans (r-xL-yL) (xU-xL+yU-yL) ((r-q)*(1#2)+yU-yL)).
+             * apply (Qplus_le_r _ _ (xL+yL)%Q) ; ring_simplify ; auto.
+             * apply (Qplus_lt_r _ _ (-yU+yL)%Q) ; ring_simplify. 
+               setoid_replace ((1 # 2) * r + (-1 # 2) * q) with ((r - q) * (1 # 2)).
+               auto. ring_simplify; reflexivity.
+           + setoid_replace ((r-q)*(1#2)+yU-yL) with ((r-q)*(1#2)+(yU-yL)).
+             apply Qplus_lt_r; auto.
+             ring_simplify; reflexivity.
+          -apply (Qplus_lt_l _ _ (r-xL-yL-q)); ring_simplify.
+           setoid_replace ((-1#1)*q+r) with (r-q);[auto|apply (Qplus_comm ((-1#1)*q)r)].
+        }
+    +left. 
+     exists xL, yL; split; auto.
+     apply (Qlt_le_trans q r (xL+yL)); auto. 
 Defined.
 
 (** Opposite value. *)
