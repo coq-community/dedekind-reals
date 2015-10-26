@@ -3,7 +3,7 @@
 Require Import Setoid Morphisms SetoidClass.
 Require Import MiscLemmas.
 Require Import QArith QOrderedType Qminmax Qabs.
-Require Import Cut Additive MinMax.
+Require Import Cut Additive .
 
 Local Open Scope Q_scope.
 
