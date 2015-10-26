@@ -9,10 +9,12 @@ Local Open Scope Q_scope.
 
 (** Multiplication. *)
 
+(* The lower cut of the product of [x] and [y]. *)
 Let mult_lower (x y : R) (q : Q) :=
   exists a b c d : Q, lower x a /\ upper x b /\ lower y c /\ upper y d /\
                       q < a * c /\ q < a * d /\ q < b * c /\ q < b * d.
 
+(* The upper cut of the product of [x] and [y]. *)
 Let mult_upper (x y : R) (q : Q) :=
   exists a b c d : Q, lower x a /\ upper x b /\ lower y c /\ upper y d /\
                       a * c < q /\ a * d < q /\ b * c < q /\ b * d < q.
@@ -44,55 +46,46 @@ Proof.
     destruct (lower_bound y) as [u S].
     destruct (upper_bound x) as [v K].
     destruct (upper_bound y) as [z M].
-exists ((Qmin (Qmin (t*u) (t*z)) (Qmin (v*z) (v*u)))-1).
-unfold mult_lower.
-exists t,v,u,z ; repeat split.
-+ assumption.
-+ assumption.
-+ assumption.
-+ assumption.
-+ destruct (Q.min_spec (Qmin (t * u) (t * z)) (Qmin (v * z) (v * u))) as [[G1 H1]|[G1 H1]].
-destruct (Q.min_spec (t * u) (t * z)) as [[G2 H2]|[G2 H2]].
-destruct (Q.min_spec (v * z) (v * u)) as [[G3 H3]|[G3 H3]].
-* setoid_rewrite H1.
-setoid_rewrite H2.
-apply (Qlt_minus_1 (t*u)).
-* setoid_rewrite H1.
-setoid_rewrite H2.
-apply (Qlt_minus_1 (t*u)).
-* setoid_rewrite H1.
-setoid_rewrite H2.
-assert (W:=(Qlt_minus_1 (t*z))).
-assert (E:=(Qlt_le_trans (t*z+(-1#1)) (t*z) (t*u) W G2)).
-auto.
-* setoid_rewrite H1.
-destruct (Q.min_spec (v * z) (v * u)) as [[G3 H3]|[G3 H3]].
-setoid_rewrite H3.
-destruct (Q.min_spec (v * z) (t * u)) as [[G4 H4]|[G4 H4]].
-assert (W:=(Qlt_minus_1 (v*z))).
-assert (V:=(Qlt_trans (v*z+(-1#1)) (v*z) (t*u) W G4)).
-assumption.
-auto.
-admit.
-admit.
-+ admit.
-+ admit.
-+ admit.
+    exists ((Qmin (Qmin (t*u) (t*z)) (Qmin (v*z) (v*u))) - 1).
+    unfold mult_lower.
+    exists t,v,u,z ; repeat split.
+    + assumption.
+    + assumption.
+    + assumption.
+    + assumption.
+    + destruct (Q.min_spec (Qmin (t * u) (t * z)) (Qmin (v * z) (v * u))) as [[G1 H1]|[G1 H1]].
+      destruct (Q.min_spec (t * u) (t * z)) as [[G2 H2]|[G2 H2]].
+      destruct (Q.min_spec (v * z) (v * u)) as [[G3 H3]|[G3 H3]].
+      * setoid_rewrite H1.
+        setoid_rewrite H2.
+        apply (Qlt_minus_1 (t*u)).
+      * setoid_rewrite H1.
+        setoid_rewrite H2.
+        apply (Qlt_minus_1 (t*u)).
+      * setoid_rewrite H1.
+        setoid_rewrite H2.
+        assert (W:=(Qlt_minus_1 (t*z))).
+        assert (E:=(Qlt_le_trans (t*z+(-1#1)) (t*z) (t*u) W G2)).
+        auto.
+      * admit. 
+    + admit.
+    + admit.
+    + admit.
   - admit.
   - intros q r H K.
     unfold mult_lower.
     destruct K as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
     exists a, b, c, d ; repeat split ; try transitivity r ; auto.
   - intros q K.
-destruct K as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
-admit.
+    destruct K as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
+    admit.
   - intros r q H K.
     unfold mult_upper.
     destruct K as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
     exists a, b, c, d ; repeat split ; try transitivity r ; auto.
   - intros r H.
-destruct H as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
-admit.
+    destruct H as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
+    admit.
   - admit.
   - admit.
 Defined.
@@ -276,4 +269,3 @@ Proof.
     + setoid_replace 0 with (a * c) ; auto.
       setoid_rewrite q ; ring_simplify ; reflexivity.
 Qed.
-  

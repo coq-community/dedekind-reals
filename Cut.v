@@ -67,7 +67,7 @@ Proof.
   split ; intros [? ?] ; split ; apply Rle_equiv ; assumption.
 Qed.
 
-(** We explain to Coq how to derive automatically that [lower] and [upper].
+(** We explain to Coq how to derive automatically that [lower] and [upper] are proper.
     This way [lower] and [upper] will behave with respect to [setoid_rewrite]. *)
 Instance R_lower_proper : Proper (Req ==> Qeq ==> iff) lower.
 Proof.
