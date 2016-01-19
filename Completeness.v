@@ -1,4 +1,3 @@
-
 (* Dedekind completeness: any cut of real numbers determines a real.
    In other words, if we perform the Dedekind construction on R we just
    get R back. 
@@ -10,6 +9,7 @@ Require Import Cut Order.
 
 Local Open Scope R_scope.
 
+(* We define the cuts on reals by mimicking the definition of cuts on rationals. *)
 Structure RCut := {
   r_lower : R -> Prop;
   r_upper : R -> Prop;
@@ -100,92 +100,90 @@ Proof.
   - auto using Rlt_linear.
 Defined.
 
+(* Every real cut determines a real. *)
 Definition R_of_RCut : RCut -> R.
 Proof.
   intro c.
   refine {| lower := (fun q => exists x, r_lower c x /\ lower x q) ;
             upper := (fun q => exists y, r_upper c y /\ upper y q)
          |}.
-  - intro.
-    intros.
+  - intros q r E.
     split.
-    + intro.
-      destruct H0.
-      exists x0.
-      rewrite H in H0.
-      assumption.
-    + intro.
-      destruct H0.
-      exists x0.
-      assert (H1:=Qeq_sym x y H).
-      rewrite H1 in H0.
-      assumption.
-  - intro.
-    intros.
+    + intros [x [? G]].
+      exists x.
+      rewrite E in G.
+      auto.
+    + intros [x [? G]].
+      exists x.
+      rewrite <- E in G.
+      auto.
+  - intros q r E.
     split.
-    + intro.
-      destruct H0.
-      exists x0.
-      rewrite H in H0.
-      assumption.
-    + intro.
-      destruct H0.
-      exists x0.
-      assert (H1:=Qeq_sym x y H).
-      rewrite H1 in H0.
-      assumption.
-  - destruct (r_lower_bound c) as [x H].
-    destruct (lower_bound x) as [q P].
+    + intros [x [? G]].
+      exists x.
+      rewrite E in G.
+      auto.
+    + intros [x [? G]].
+      exists x.
+      rewrite <- E in G.
+      auto.
+  - destruct (r_lower_bound c) as [x ?].
+    destruct (lower_bound x) as [q ?].
     exists q, x ; auto.
-  - destruct (r_upper_bound c) as [x H].
-    destruct (upper_bound x) as [q P].
+  - destruct (r_upper_bound c) as [x ?].
+    destruct (upper_bound x) as [q ?].
     exists q, x ; auto.
-  - intros q r A [x[C D]].
+  - intros q r A [x [C D]].
     exists x.
-    split.
-    + assumption.
-    + assert (J:=(lower_lower x q r A D)).
-      assumption.
-  - intros q [x[C D]].
-    assert(E:=(lower_open x q D)).
-    destruct E as [r [F G]].
+    split ; auto.
+    apply (lower_lower x q r) ; assumption.
+  - intros q [x [C D]].
+    destruct (lower_open x q D) as [r [F G]].
     exists r.
-    split.
-    + assumption.
-    + exists x.
-      split ; assumption.
-  - intros q r A [x[C D]].
+    split ; auto.
+    exists x ; auto.
+  - intros q r A [x [C D]].
     exists x.
-    split.
-    + assumption.
-    + assert (J:=(upper_upper x q r A D)).
-      assumption.
-  - intros r [y[C D]].
-    assert(E:=(upper_open y r D)).
-    destruct E as [q [F G]].
+    split ; auto.
+    apply (upper_upper x q r) ; assumption.
+  - intros r [y [C D]].
+    destruct (upper_open y r D) as [q [F G]].
     exists q.
-    split.
-    + assumption.
-    + exists y.
-      split ; assumption.
-  - intro.
-    apply neg_false.
-    split.
-    + intros [ [x[X1 X2]] [y[Y1 Y2]] ].
-assert (T:=(disjoint x q)).
-firstorder.
-admit.
-    + intro.
-      tauto.
+    split ; auto.
+    exists y ; auto.
+  - intros q [[x [H1 H2]] [y [G1 G2]]].
+    absurd (r_lower c x /\ r_upper c x).
+    + apply r_disjoint.
+    + split ; auto.
+      apply (r_upper_upper c y x) ; auto.
+      exists q ; auto.
   - intros q r H.
-    admit.
+    assert (G : ((q + q + r) * (1#3) < (q + r + r) * (1#3))%R).
+    + exists ((q + r) * (1#2)) ; split.
+      * apply (Qmult_lt_r _ _ (6#1)); [reflexivity | idtac].
+        apply (Qplus_lt_r _ _ (- (3#1) * q - (2#1) * r)).
+        now ring_simplify.
+      * apply (Qmult_lt_r _ _ (6#1)); [reflexivity | idtac].
+        apply (Qplus_lt_r _ _ (- (2#1) * q - (3#1) * r)).
+        now ring_simplify.
+    + destruct (r_located c ((q + q + r) * (1#3)) ((q + r + r) * (1#3)) G).
+      * left; exists ((q + q + r) * (1#3)) ; split ; auto.
+        apply (Qmult_lt_r _ _ (3#1)); [reflexivity | idtac].
+        apply (Qplus_lt_r _ _ (- (2#1) * q)).
+        now ring_simplify.
+      * right ; exists ((q + r + r) * (1#3)) ; split ; auto.
+        apply (Qmult_lt_r _ _ (3#1)); [reflexivity | idtac].
+        apply (Qplus_lt_r _ _ (- (2#1) * r)).
+        now ring_simplify.
 Defined.
 
+(* The passage from real cuts to reals to real cuts is identity,
+   which shows that every real cut is determined by a real, i.e.,
+   we have Dedekind completeness. *)
 Theorem dedekind_complete :
-  forall c : RCut, (c == RCut_of_R (R_of_RCut c))%type.
+  forall c : RCut, c == RCut_of_R (R_of_RCut c).
 Proof.
-  intro c.
-  split ; intro x ; split ; intro H.
+  intro c ; split ; intro x ; split ; intro H.
   - destruct (r_lower_open c x H) as [y [[q [? ?]] ?]].
     exists q ; split ; auto.
     exists y ; auto.
@@ -195,10 +193,9 @@ Proof.
   - destruct (r_upper_open c x H) as [y [[q [? ?]] ?]].
     exists q ; split ; auto.
     exists y ; auto.
-  - destruct H.
-    destruct H.
-    destruct H.
-    destruct H.
-    apply (r_upper_upper c x1 x) ; auto.
-    exists x0 ; split ; auto.
+  - destruct H as [q [[y [? ?]] G2]].
+    apply (r_upper_upper c y x).
+    + exists q ; auto.
+    + assumption.
 Qed.
+
