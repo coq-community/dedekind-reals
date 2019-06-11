@@ -4,6 +4,16 @@ Require Import QArith QOrderedType.
 Require Import Morphisms SetoidClass.
 Require Import MiscLemmas.
 
+(** In the definition below we use disjunction and existence where one might
+    expect sums and disjoint sums, in particular in [lower_open], [upper_open],
+    and [located].
+
+    See "Extensional constructive real analysis via locators" by Auke Booij,
+    https://export.arxiv.org/abs/1805.06781, for a discussion of what happens
+    when we replace the disjunction in [located] with a sum (spoiler: we get
+    the Cauchy reals!).
+*)
+
 (** A Dedekind cut is represented by the predicates [lower] and [upper],
     satisfying a number of conditions. *)
 Structure R := {
@@ -14,7 +24,7 @@ Structure R := {
   (* The cuts respect equality on Q. *)
   lower_proper : Proper (Qeq ==> iff) lower;
   upper_proper : Proper (Qeq ==> iff) upper;
-  (* The cuts are inabited. *)
+  (* The cuts are inhabited. *)
   lower_bound : {q : Q | lower q};
   upper_bound : {r : Q | upper r};
   (* The lower cut is a lower set. *)
