@@ -7,26 +7,31 @@ Require Import Cut Additive .
 
 Local Open Scope Q_scope.
 
+(** A hack to be able to have proof-relevant unfinished constructions.
+    When this file is cleaned up, remove this axiom and the tactic. *)
+Axiom unfinished : forall (A : Type), A.
+Ltac todo := apply unfinished.
+
 (** Multiplication. *)
 
 (* The lower cut of the product of [x] and [y]. *)
-Let mult_lower (x y : R) (q : Q) :=
+Local Definition mult_lower (x y : R) (q : Q) :=
   exists a b c d : Q, lower x a /\ upper x b /\ lower y c /\ upper y d /\
                       q < a * c /\ q < a * d /\ q < b * c /\ q < b * d.
 
 (* The upper cut of the product of [x] and [y]. *)
-Let mult_upper (x y : R) (q : Q) :=
+Local Definition mult_upper (x y : R) (q : Q) :=
   exists a b c d : Q, lower x a /\ upper x b /\ lower y c /\ upper y d /\
                       a * c < q /\ a * d < q /\ b * c < q /\ b * d < q.
 
-Let mult_lower_proper (x y : R) : Proper (Qeq ==> iff) (mult_lower x y).
+Definition mult_lower_proper (x y : R) : Proper (Qeq ==> iff) (mult_lower x y).
 Proof.
   intros q r Eqr ; split ; intros [a [b [c [d H]]]].
   - exists a, b, c, d ; setoid_rewrite <- Eqr ; assumption.
   - exists a, b, c, d ; setoid_rewrite -> Eqr ; assumption.
 Qed.
 
-Let mult_upper_proper (x y : R) : Proper (Qeq ==> iff) (mult_upper x y).
+Local Definition mult_upper_proper (x y : R) : Proper (Qeq ==> iff) (mult_upper x y).
 Proof.
   intros q r Eqr ; split ; intros [a [b [c [d H]]]].
   - exists a, b, c, d ; setoid_rewrite <- Eqr ; assumption.
@@ -67,27 +72,27 @@ Proof.
         assert (W:=(Qlt_minus_1 (t*z))).
         assert (E:=(Qlt_le_trans (t*z+(-1#1)) (t*z) (t*u) W G2)).
         auto.
-      * admit. 
-    + admit.
-    + admit.
-    + admit.
-  - admit.
+      * todo. 
+    + todo.
+    + todo.
+    + todo.
+  - todo.
   - intros q r H K.
     unfold mult_lower.
     destruct K as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
     exists a, b, c, d ; repeat split ; try transitivity r ; auto.
   - intros q K.
     destruct K as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
-    admit.
+    todo.
   - intros r q H K.
     unfold mult_upper.
     destruct K as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
     exists a, b, c, d ; repeat split ; try transitivity r ; auto.
   - intros r H.
     destruct H as [a [b [c [d [? [? [? [? [? [? [? ?]]]]]]]]]]].
-    admit.
-  - admit.
-  - admit.
+    todo.
+  - todo.
+  - todo.
 Defined.
 
 Infix "*" := Rmult : R_scope.
@@ -103,7 +108,9 @@ Qed.
 (** Properties of multiplication. *)
 
 Lemma Rmult_assoc (x y z : R) : ((x * y) * z == x * (y * z))%R.
-Admitted.
+Proof.
+  todo.
+Defined.
 
 Lemma Rmult_comm (x y : R) : (x * y == y * x)%R.
 Proof.
@@ -129,7 +136,7 @@ Proof.
       apply (lower_lower x q 0) ; auto.
       apply (Qlt_le_trans _ (a * 0)) ; auto.
       ring_simplify ; discriminate.
-  - admit.
+  - todo.
 Qed.
 
 Lemma Rmult_1_r (x : R) : (x * 1 == x)%R.
@@ -142,17 +149,21 @@ Qed.
 (* Distributivity *)
 
 Lemma Qmult_plus_distr_r (x y z : R) : (x * (y + z) == (x * y) + (x * z))%R.
-Admitted.
+Proof.
+  todo.
+Defined.
 
 Lemma Qmult_plus_distr_l (x y z : R) : ((x + y) * z == (x * z) + (y * z))%R.
-Admitted.
+Proof.
+  todo.
+Defined.
 
 (* Inverse. *)
 
 Theorem Rinv_apart_0 : forall x : R, ({ y | x * y == 1 } -> x ## 0)%R.
 Proof.
   intros x [y E].
-  admit.
+  todo.
 Qed.
 
 
@@ -166,16 +177,16 @@ Proof.
       upper := (fun q => (exists r, lower x r /\ upper x 0 /\ q * r < 1) \/
                          (exists r, 0 < r /\ lower x r /\ 1 < q * r))
     |}.
-  - admit.
-  - admit. 
-  - admit. 
-  - admit. 
-  - admit. 
-  - admit. 
-  - admit. 
-  - admit. 
-  - admit. 
-  - admit. 
+  - todo.
+  - todo. 
+  - todo. 
+  - todo. 
+  - todo. 
+  - todo. 
+  - todo. 
+  - todo. 
+  - todo. 
+  - todo. 
 Defined.
 
 (*
@@ -197,9 +208,9 @@ Proof.
         setoid_replace 0 with (b * 0) ; [ idtac | (symmetry ; apply Qmult_0_r)].
         apply Qmult_le_compat_l ; auto.
         apply Qlt_le_weak, (lower_below_upper x) ; auto.
-    + admit.
-    + admit.
-    + admit.
+    + todo.
+    + todo.
+    + todo.
 Qed.
 *)
 
@@ -247,7 +258,7 @@ Proof.
        setoid_rewrite (Qmult_comm b c).
        apply Qmult_le_neg_pos_pos ; auto.
        apply Qlt_le_weak, (lower_below_upper x) ; auto.
-  - admit.
+  - todo.
 Qed.
 
 Theorem R_inv_apart_0 : forall x : R, ({y | x * y == 1} -> x ## 0)%R.
@@ -258,12 +269,12 @@ Proof.
   destruct (Q_dec c 0) as [[?|?]|?].
   - left ; exists b ; split ; auto.
     simpl ; transitivity ((1 # 2) / c).
-    + admit.
-    + admit.
+    + todo.
+    + todo.
   - right ; exists a ; split ; auto.
     simpl. transitivity ((1 # 2) / c).
-    + admit.
-    + admit.
+    + todo.
+    + todo.
   - absurd (1 # 2 < 0).
     + discriminate.
     + setoid_replace 0 with (a * c) ; auto.

@@ -8,6 +8,11 @@ Require Import Archimedean.
 
 Local Open Scope R_scope.
 
+(** A hack to be able to have proof-relevant unfinished constructions.
+    When this file is cleaned up, remove this axiom and the tactic. *)
+Axiom unfinished : forall (A : Type), A.
+Ltac todo := apply unfinished.
+
 (* Properties of < *)
 
 Theorem Rlt_irrefl : forall (x : R), ~ (x < x).
@@ -222,20 +227,20 @@ Qed.
 
 Theorem Rmult_le_compat_r : forall (x y z : R), 0 <= z -> x <= y -> x * z <= y * z.
 Proof.
-  admit.
+  todo.
 Qed.
 
 Theorem Rmult_le_compat_l : forall (x y z : R), 0 <= x -> y <= z -> x * y <= x * z.
 Proof.
-  admit.
+  todo.
 Qed.
 
 Theorem Rmult_lt_compat_r : forall (x y z : R), 0 < z -> (x < y <-> x * z < y * z).
 Proof.
-  admit.
+  todo.
 Qed.
 
 Theorem Rmult_lt_compat_l : forall (x y z : R), 0 < x -> (y < z <-> x * y < x * z).
 Proof.
-  admit.
+  todo.
 Qed.

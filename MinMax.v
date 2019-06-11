@@ -8,6 +8,11 @@ Require Import Cut MiscLemmas Additive Multiplication Order.
 
 Local Open Scope R_scope.
 
+(** A hack to be able to have proof-relevant unfinished constructions.
+    When this file is cleaned up, remove this axiom and the tactic. *)
+Axiom unfinished : forall (A : Type), A.
+Ltac todo := apply unfinished.
+
 Definition Rmin : R -> R -> R.
 Proof.
   intros x y.
@@ -218,21 +223,7 @@ Qed.
 
 Theorem Rmax_spec (x y z : R) : Rmax x y <= z <-> x <= z /\ y <= z.
 Proof.
-unfold Rle.
-split.
-- intro.
-split.
-+ intros q A.
-assert (C:=(H q)).
-admit.
-+ intros q A.
-assert (C:=(H q)).
-admit.
-- intros [H1 H2].
-intros q A.
-assert (C1:=(H1 q)).
-assert (C2:=(H2 q)).
-admit.
+  todo.
 Qed.
 
 Theorem Rmax_upper_l (x y : R) : x <= Rmax x y.
@@ -289,54 +280,54 @@ Qed.
 
 Theorem Rmin_plus_distr_r (x y z : R) : Rmin (x + z) (y + z) == Rmin x y + z.
 Proof.
-  admit.
+  todo.
 Qed.
 
 Theorem Rmin_plus_distr_l (x y z : R) : Rmin (x + y) (x + z) == x + Rmin y z.
 Proof.
-  admit.
+  todo.
 Qed.
 
 Theorem Rmax_plus_distr_r (x y z : R) : Rmax (x + z) (y + z) == Rmax x y + z.
 Proof.
-  admit.
+  todo.
 Qed.
 
 Theorem Rmax_plus_distr_l (x y z : R) : Rmax (x + y) (x + z) == x + Rmax y z.
 Proof.
-  admit.
+  todo.
 Qed.
 
 (* Distributivity of * over min and max. *)
 
 Theorem Rmin_mult_distr_r (x y z : R) : 0 < z -> Rmin (x * z) (y * z) == Rmin x y * z.
 Proof.
-  admit.
+  todo.
 Qed.
 
 Theorem Rmin_mult_distr_l (x y z : R) : 0 < x -> Rmin (x * y) (x * z) == x * Rmin y z.
 Proof.
-  admit.
+  todo.
 Qed.
 
 Theorem Rmax_mult_distr_r (x y z : R) : 0 < z -> Rmax (x * z) (y * z) == Rmax x y * z.
 Proof.
-  admit.
+  todo.
 Qed.
 
 Theorem Rmax_mult_distr_l (x y z : R) : 0 < x -> Rmax (x * y) (x * z) == x * Rmax y z.
 Proof.
-  admit.
+  todo.
 Qed.
 
 (* Opposite in relation to min and max. *)
 
 Theorem Ropp_min (x y : R) : Rmin (-x) (-y) == - (Rmax x y).
 Proof.
-  admit.
+  todo.
 Qed.
 
 Theorem Ropp_max (x y : R) : Rmax (-x) (-y) == - (Rmin x y).
 Proof.
-  admit.
+  todo.
 Qed.

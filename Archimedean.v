@@ -13,6 +13,11 @@ Require Import Cut.
 
 Local Open Scope Q_scope.
 
+(** A hack to be able to have proof-relevant unfinished constructions.
+    When this file is cleaned up, remove this axiom and the tactic. *)
+Axiom unfinished : forall (A : Type), A.
+Ltac todo := apply unfinished.
+
 Definition straddle (x : R) (q : Q) :=
   exists l u : Q, lower x l /\ upper x u /\ u - l < q.
 
@@ -74,15 +79,15 @@ Proof.
     simpl ; ring_simplify ; assumption.
   - intro.
     cut (straddle x ((2#3) * ((2#3)^Z.of_nat n * q))).
-    + admit.
+    + todo.
     + auto using trisect.
-Qed.
+Defined.
 
 Lemma two_thirds_power_small (q r : Q) :
   0 < q -> 0 < r -> { n : nat | (2#3)^(Z_of_nat n) * q < r }.
 Proof.
-  admit.
-Qed.
+  todo.
+Defined.
 
 Lemma archimedean (x : R) (q : Q) : 0 < q -> straddle x q.
 Proof.

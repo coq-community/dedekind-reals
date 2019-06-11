@@ -1,3 +1,7 @@
 *.glob
 *.vo
 *.v.d
+/.coqdeps.d
+/Makefile.coq
+/Makefile.coq.conf
+/html
