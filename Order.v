@@ -4,6 +4,7 @@ Require Import Morphisms Setoid.
 Require Import QArith.
 Require Import Cut.
 Require Import Additive Multiplication.
+Require Import Archimedean.
 
 Local Open Scope R_scope.
 
@@ -57,17 +58,13 @@ Proof.
   intros x [A1|A2]; auto using (Rlt_irrefl x).
 Qed.
 
-Theorem Req_neq: forall x y:R, {x==y} + {x##y}.
-Admitted.
-
-Theorem Rnew_contrans : forall x y z : R, x ## y -> ((x ## z) + (y ## z))%type.
+Theorem Rnew_contrans : forall x y z : R, x ## y -> ((x ## z) \/ (y ## z)).
 Proof.
-  intros.
-  destruct (Req_neq x z).
-  - destruct r as [H1 H2].
-    right.
-    admit.  (*first order can solve this*)
-  - left; assumption.
+  intros. destruct H.
+  - destruct (Rlt_linear x y z H). left. left. apply H0.
+    right. right. apply H0.
+  - destruct (Rlt_linear y x z H). right. left. apply H0.
+    left. right. apply H0.
 Qed.
 
 
@@ -114,7 +111,9 @@ Proof.
     destruct (located x q r) ; auto.
     elim H.
     exists r ; auto.
-  - admit.
+  - intros H abs. pose proof (Rlt_le_weak x y abs).
+    pose proof (Rle_antisym x y H0 H). rewrite H1 in abs.
+    apply (Rlt_irrefl y abs).
 Qed.
 
 Theorem Rlt_le_trans : forall (x y z : R), x < y -> y <= z -> x < z.
@@ -131,7 +130,14 @@ Proof.
   apply Rle_equiv in H ; auto.
 Qed.
 
-(* Compatibility of < and <= with additive structure. *)
+(* Compatibility of < and <= with additive structure.
+
+   This compatibility is equivalent to
+   the density of Q in R, because of the case :
+      forall (r : Q) (x : R),
+         Qlt 0 r -> Rlt x (x + R_of_Q r)
+   where Rlt means the existence of a rational number
+   between x and x+r. *)
 
 Theorem R0_lt_1 : 0 < 1.
 Proof.
@@ -141,13 +147,36 @@ Proof.
   assert (0<(1#2))%Q; [reflexivity | auto].
   assert ((1#2)<1)%Q; [reflexivity | auto]. 
 Qed.
-
+  
 Theorem Rplus_lt_compat_r : forall (x y z : R),  x < y <-> x + z < y + z.
 Proof.
-  unfold Rlt.
-  split ; intros [q [H1 H2]].
-  - admit.
-  - admit.
+  split.
+  - intros [q maj].
+    (* Get another rational number between r1 and r2 *)
+    destruct (upper_open x q) as [t H]. apply maj.
+    (* approximate r *)
+    destruct (archimedean z (q-t)) as [h [u H0]].
+    rewrite <- (Qlt_minus_iff t q). apply H.
+    exists (q+h)%Q. split.
+    + destruct (upper_open x t). apply H.
+      exists x0,u. split. 2: split. 2: apply H1. 2: apply H0.
+      apply (Qlt_trans _ (t+u)). apply Qplus_lt_l. apply H1.
+      apply (Qplus_lt_l _ _ (-t-h)). ring_simplify.
+      destruct H0,H2. ring_simplify in H3. rewrite <- (Qplus_comm q).
+      apply H3.
+    + destruct (lower_open y q). apply maj.
+      exists x0,h. split. apply Qplus_lt_l. apply H1.
+      split. apply H1. apply H0.
+  - intros [q [[a [b H]] [c [d H0]]]].
+    destruct H,H0,H1,H2.
+    pose proof (Qlt_trans (a+b) q (c + d) H H0).
+    clear H. clear H0. clear q.
+    pose proof (lower_below_upper z d b H4 H3).
+    clear H4. clear H3. clear z.
+    exists a. split. apply H1. apply (lower_le y a c).
+    apply H2. apply Qlt_le_weak.
+    rewrite <- (Qplus_lt_l _ _ b). apply (Qlt_trans _ (c+d) _ H5).
+    apply Qplus_lt_r. apply H.
 Qed.
 
 Theorem Rplus_lt_compat_l : forall (x y z : R),  y < z <-> x + y < x + z.
@@ -160,24 +189,33 @@ Qed.
 
 Theorem Rplus_le_compat_r : forall (x y z : R),  x <= y <-> x + z <= y + z.
 Proof.
-  unfold Rle.
-  split; intros.
-  - admit.
-  - admit.
+  split.
+  - intros H. rewrite <- Rnot_lt_le. intro abs.
+    apply Rplus_lt_compat_r in abs. rewrite <- Rnot_lt_le in H.
+    contradiction.
+  - intros. rewrite <- Rnot_lt_le in H. rewrite <- Rnot_lt_le.
+    intro abs. apply (Rplus_lt_compat_r _ _ z) in abs. contradiction.
 Qed.
 
 Theorem Rplus_le_compat_l : forall (x y z : R),  y <= z <-> x + y <= x + z.
 Proof.  
-  intros.
-  admit.
+  intros. rewrite Rplus_comm. rewrite <- (Rplus_comm z).
+  apply Rplus_le_compat_r.
 Qed.
 
 Theorem Rplus_positive : forall (x y : R), 0 < x + y -> 0 < x \/ 0 < y.
 Proof.
   unfold Rlt.
   intros.
-  destruct H as [q [H1 H2]].
-  admit.
+  destruct H as [q [H1 H2]]. destruct H2 as [r [s H2]].
+  destruct (Qlt_le_dec 0 r).
+  - left. exists r. split. apply q0. apply H2.
+  - right. exists s. split. 2: apply H2. destruct H2.
+    apply (Qplus_lt_r _ _ (-r)) in H.
+    ring_simplify in H. apply (Qlt_trans 0 ((-1 # 1) * r + q)).
+    2: apply H. rewrite <- (Qplus_0_r 0).
+    rewrite <- (Qplus_comm q). apply Qplus_lt_le_compat.
+    apply H1. apply (Qplus_le_r _ _ r). ring_simplify. apply q0.
 Qed.
 
 (* Compatibility of < and <= with multiplicative structure. *)
