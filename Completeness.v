@@ -3,7 +3,7 @@
    get R back. 
 *)
 
-Require Import Morphisms Setoid SetoidClass.
+Require Import Morphisms.
 Require Import QArith.
 Require Import Cut Order.
 
@@ -28,34 +28,46 @@ Structure RCut := {
 Definition RCut_eq (c d : RCut) :=
   (forall x, r_lower c x <-> r_lower d x) /\ (forall x, r_upper c x <-> r_upper d x).
 
-Instance RCut_Setoid : Setoid RCut := {| equiv := RCut_eq |}.
+Lemma RCut_eq_refl : forall c:RCut, RCut_eq c c.
 Proof.
+  intro c. split; intro; tauto.
+Qed.
+
+Lemma RCut_eq_sym : forall c d:RCut, RCut_eq c d -> RCut_eq d c.
+Proof.
+  intro.
+  intros y H.
+  unfold RCut_eq.
+  destruct H.
   split.
-  - intro.
-    unfold RCut_eq.
-    split ; intro ; tauto.
-  - intro.
-    intros y H.
-    unfold RCut_eq.
-    destruct H.
-    split.
-    + intro x0.
-      apply iff_sym.
-      apply H.
-    + intro x0.
-      apply iff_sym.
-      apply H0.
-  - intro.
-    intros y z A B.
-    destruct A as [A1 A2].
-    destruct B as [B1 B2].
-    unfold RCut_eq.
-    split.
-    + intro.
-      eauto using iff_trans.
-    + intro.
-      eauto using iff_trans.
-Defined.
+  + intro x0.
+    apply iff_sym.
+    apply H.
+  + intro x0.
+    apply iff_sym.
+    apply H0.
+Qed.
+
+Lemma RCut_eq_trans : forall c d e:RCut,
+    RCut_eq c d -> RCut_eq d e -> RCut_eq c e.
+Proof.
+  intro.
+  intros y z A B.
+  destruct A as [A1 A2].
+  destruct B as [B1 B2].
+  unfold RCut_eq.
+  split.
+  + intro.
+    eauto using iff_trans.
+  + intro.
+    eauto using iff_trans.
+Qed.
+
+Add Parametric Relation : RCut RCut_eq
+    reflexivity proved by RCut_eq_refl
+    symmetry proved by RCut_eq_sym
+    transitivity proved by RCut_eq_trans
+      as RCut_eq_rel.
 
 (* Every real determines a real cut. *)
 Definition RCut_of_R : R -> RCut.
@@ -181,7 +193,7 @@ Defined.
    which shows that every real cut is determined by a real, i.e.,
    we have Dedekind completeness. *)
 Theorem dedekind_complete :
-  forall c : RCut, c == RCut_of_R (R_of_RCut c).
+  forall c : RCut, RCut_eq c (RCut_of_R (R_of_RCut c)).
 Proof.
   intro c ; split ; intro x ; split ; intro H.
   - destruct (r_lower_open c x H) as [y [[q [? ?]] ?]].
