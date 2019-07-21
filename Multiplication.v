@@ -515,16 +515,6 @@ Proof.
   rewrite (Qabs_pos e H). ring.
 Qed.
 
-Definition DReal_approx (x : R) (eps : Q) :
-  Qlt 0 eps -> exists q:Q, lower x q /\ upper x (q+eps).
-Proof.
-  intros. destruct (archimedean x eps H) as [q [r maj]].
-  destruct maj, H1.
-  exists q. split. exact H0. apply (upper_upper x r). 2: exact H1.
-  rewrite <- (Qplus_lt_l _ _ (-q)).
-  setoid_replace (q + eps -q) with eps. exact H2. ring.
-Qed.
-
 (* Locate both factors to locate the multiplication. *)
 Lemma DReal_locate_mult
   : forall (x y : R) (eta : Q),
