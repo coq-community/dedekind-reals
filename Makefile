@@ -16,7 +16,9 @@ MODULES := \
 	MinMax \
 	Archimedean \
 	Completeness \
-	Order
+	Order \
+	Cauchy \
+	DecOrder
 
 VS      := $(MODULES:%=%.v)
 

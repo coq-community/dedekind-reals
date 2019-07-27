@@ -65,6 +65,19 @@ Proof.
     exfalso ; apply (disjoint x r) ; auto.
 Qed.
 
+(* Rle is a negative proposition *)
+Lemma Rnot_lt_le : forall r1 r2:R, ~ Rlt r1 r2 <-> Rle r2 r1.
+Proof.
+  split.
+  - intros. intros q l. unfold Rlt in H.
+    destruct (lower_open r2 q l), H0.
+    assert (~upper r1 x).
+    { intro abs. apply H. exists x. split; assumption. }
+    destruct (located r1 q x H0). exact H3. contradiction.
+  - intros H [r [H0 H1]]. specialize (H r H1).
+    apply (disjoint r1 r); split; assumption.
+Qed.
+
 (** Equality. *)
 Definition Req (x y : R) := Rle x y /\ Rle y x.
 

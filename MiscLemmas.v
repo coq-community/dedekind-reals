@@ -249,6 +249,34 @@ Proof.
   - apply Qpower_nonzero, Qnot_eq_sym, Qlt_not_eq ; assumption.
 Qed.
 
+Lemma pow_Q1_Qle : forall (q:Q) (n:nat),
+    Qle 1 q
+    -> Qle 1 (q^Z.of_nat n).
+Proof.
+  induction n.
+  - intros. apply Qle_refl.
+  - intros. rewrite Nat2Z.inj_succ. unfold Z.succ. rewrite Qpower_plus.
+    apply (Qle_trans _ (q ^ Z.of_nat n * 1)).
+    rewrite Qmult_1_r. exact (IHn H). rewrite Qmult_le_l. exact H.
+    apply Qpower_strictly_pos. apply (Qlt_le_trans 0 1 q).
+    reflexivity. exact H. intro abs. rewrite abs in H.
+    apply (Qle_not_lt _ _ H). reflexivity.
+Qed.
+
+Lemma pow_Q1_incr : forall (q:Q) (n p:nat),
+    Qle 1 q
+    -> le n p
+    -> Qle (q ^ Z.of_nat n) (q^Z.of_nat p).
+Proof.
+  intros. destruct (Nat.le_exists_sub n p H0), H1. subst p.
+  rewrite <- Qmult_1_l.
+  rewrite Nat2Z.inj_add. rewrite Qpower_plus.
+  rewrite Qmult_le_r. apply pow_Q1_Qle. exact H.
+  apply Qpower_strictly_pos. apply (Qlt_le_trans 0 1 q).
+  reflexivity. exact H. intro abs. rewrite abs in H.
+  apply (Qle_not_lt _ _ H). reflexivity.
+Qed.
+
 Lemma Qabs_eq_0 : forall q, Qabs q == 0 -> q == 0.
 Proof.
   intros q Hq.

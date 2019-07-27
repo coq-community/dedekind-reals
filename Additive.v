@@ -244,7 +244,7 @@ Proof.
   rewrite Qopp_opp in * |- * ; assumption.
 Qed.
 
-Lemma Rpluss_opp_r (x : R) : x + (- x) == 0.
+Lemma Rplus_opp_r (x : R) : x + (- x) == 0.
 Proof.
   split ; intros q H.
    - destruct H as [r [s [G1 [G2 G3]]]].
@@ -263,5 +263,23 @@ Qed.
 Lemma Rplus_opp_l (x : R) : (- x) + x == 0.
 Proof.
   rewrite Rplus_comm.
-  apply Rpluss_opp_r.
+  apply Rplus_opp_r.
+Qed.
+
+Lemma Rplus_lt_reg_l : forall r r1 r2, r + r1 < r + r2 -> r1 < r2.
+Proof.
+  intros. destruct H as [q [u l]]. destruct u,H,H,l,H1,H1.
+  assert (x + x0 < x1 + x2)%Q.
+  { exact (Qlt_trans _ q _ H H1). }
+  clear H1 H q.
+  exists x0. split. apply H0.
+  apply (lower_lower r2 x0 x2). 2: apply H2.
+  rewrite <- (Qplus_lt_r _ _ x). apply (Qlt_trans _ (x1+x2) _ H3).
+  rewrite Qplus_lt_l. apply (lower_below_upper r). apply H2. apply H0.
+Qed.
+
+Lemma Rplus_lt_reg_r : forall r r1 r2, r1 + r < r2 + r -> r1 < r2.
+Proof.
+  intros. rewrite Rplus_comm, (Rplus_comm r2) in H.
+  apply (Rplus_lt_reg_l _ _ _ H).
 Qed.
