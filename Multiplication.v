@@ -49,6 +49,20 @@ Proof.
   rewrite H. rewrite H. apply H.
 Qed.
 
+Lemma Qmax4_opp : forall a b c d : Q,
+    Qeq (Qmax4 (-a) (-b) (-c) (-d))
+        (- Qmin4 a b c d).
+Proof.
+  assert (forall a b : Q, Qeq (Qmax (-a) (-b)) (- Qmin a b)).
+  { intros. destruct (Qlt_le_dec a b). rewrite Q.max_l.
+    rewrite Q.min_l. reflexivity. apply Qlt_le_weak. apply q.
+    apply Qopp_le_compat. apply Qlt_le_weak. apply q.
+    rewrite Q.min_r. rewrite Q.max_r. reflexivity.
+    apply Qopp_le_compat. apply q. apply q. }
+  intros. unfold Qmin4, Qmax4.
+  rewrite H. rewrite H. apply H.
+Qed.
+
 Lemma Qpos_above_opp : forall q : Q,
     Qlt 0 q <-> Qlt (-q) q.
 Proof.
@@ -680,11 +694,6 @@ Qed.
 
 (** Properties of multiplication. *)
 
-Lemma Rmult_assoc (x y z : R) : ((x * y) * z == x * (y * z))%R.
-Proof.
-  todo.
-Defined.
-
 Lemma Rmult_comm (x y : R) : (x * y == y * x)%R.
 Proof.
   split ; intros q [a [b [c [d [? [? [? ?]]]]]]].
@@ -697,7 +706,72 @@ Proof.
     rewrite (Qmult_comm c a), (Qmult_comm d a), (Qmult_comm c b),
     (Qmult_comm d b), Qmin4_flip. apply H2.
 Qed.
- 
+
+Definition shrink_factor (a b : Q)
+  : Qlt a b -> { q : Q | Qlt 0 q /\ Qlt q 1 /\ Qlt a (q*b) }.
+Proof.
+  intros. destruct (Qlt_le_dec 0 a).
+  - assert (Qlt 0 b).
+    { apply (Qlt_trans _ a _ q). exact H. }
+    exists ((a/b+1)*(1#2)). repeat split.
+    rewrite <- (Qmult_0_l (1#2)). apply Qmult_lt_r.
+    reflexivity.
+    apply (Qlt_le_trans 0 (0+1)). reflexivity.
+    apply Qplus_le_l. rewrite <- (Qmult_0_l (/b)).
+    apply Qmult_le_r. apply Qinv_lt_0_compat. exact H0.
+    apply Qlt_le_weak. exact q.
+    apply middle_between.
+    apply (Qmult_lt_l _ _ b). exact H0. field_simplify. exact H.
+    intro abs. rewrite abs in H0. apply (Qlt_irrefl 0 H0).
+    apply (Qmult_lt_r _ _ (/b)).
+    apply Qinv_lt_0_compat. exact H0.
+    rewrite <- Qmult_assoc. rewrite Qmult_inv_r, Qmult_1_r.
+    apply middle_between.
+    apply (Qmult_lt_l _ _ b). exact H0. field_simplify. exact H.
+    intro abs. rewrite abs in H0. apply (Qlt_irrefl 0 H0).
+    intro abs. rewrite abs in H0. apply (Qlt_irrefl 0 H0).
+  - exists (1#2). repeat split. 
+    destruct (Qlt_le_dec 0 b). apply (Qle_lt_trans _ ((1#2)*0)).
+    rewrite Qmult_0_r. exact q. apply Qmult_lt_l.
+    reflexivity. exact q0. apply (Qlt_le_trans a b _ H).
+    rewrite <- (Qmult_le_l _ _ 2). field_simplify.
+    rewrite <- (Qplus_le_l _ _ (-b)). ring_simplify. exact q0.
+    reflexivity.
+Qed.
+
+Definition expand_factor (a b : Q)
+  : Qlt a b -> { q : Q | Qlt 1 q /\ Qlt a (q*b) }.
+Proof.
+  intros. destruct (Qlt_le_dec b 0).
+  - exists ((1+a/b)*(1#2)). split. apply middle_between.
+    apply Qopp_lt_compat. apply (Qmult_lt_l _ _ (-b)). 
+    apply (Qplus_lt_l _ _ b). ring_simplify. exact q.
+    unfold Qdiv. field_simplify.
+    unfold Qdiv. field_simplify. exact H.
+    apply Qlt_not_eq. exact q.
+    apply Qlt_not_eq. exact q.
+    apply Qopp_lt_compat. apply (Qmult_lt_l _ _ (-/b)). 
+    setoid_replace (-/b) with (/-b). 2: field.
+    apply Qinv_lt_0_compat.
+    apply (Qplus_lt_l _ _ b). ring_simplify. exact q.
+    apply Qlt_not_eq. exact q.
+    field_simplify.
+    setoid_replace (((1 # 2) * b + (1 # 2) * a) / b)
+      with ((1+a/b)*(1#2)).
+    2: field.
+    apply middle_between.
+    apply Qopp_lt_compat. apply (Qmult_lt_l _ _ (-b)). 
+    apply (Qplus_lt_l _ _ b). ring_simplify. exact q.
+    field_simplify. unfold Qdiv. field_simplify. exact H.
+    apply Qlt_not_eq. exact q.
+    apply Qlt_not_eq. exact q.
+    apply Qlt_not_eq. exact q.
+    apply Qlt_not_eq. exact q.
+    apply Qlt_not_eq. exact q.
+  - exists 2. split. reflexivity. apply (Qlt_le_trans a b _ H).
+    apply (Qplus_le_l _ _ (-b)). ring_simplify. exact q.
+Qed.
+
 Lemma Rmult_1_l (x : R) : (1 * x == x)%R.
 Proof.
   split ; intro q.
@@ -725,7 +799,24 @@ Proof.
       apply (Qle_trans _ (Qmin (b*0) (b*d))).
       apply Q.le_min_r. setoid_replace (b*0) with 0. apply Q.le_min_l.
       ring. ring_simplify. discriminate.
-  - todo.
+  - intros. destruct (upper_bound x), (lower_open x q H).
+    destruct (shrink_factor q x1), (expand_factor q x1).
+    apply H0. apply H0. apply H0.
+    exists x2,x3,x1, (Qmax x0 (1+(/x2)*Qabs q)). repeat split.
+    apply a. apply a0. apply H0. apply (upper_le x x0). apply u. apply Q.le_max_l.
+    apply Q.min_glb_lt. apply Q.min_glb_lt. 3: apply Q.min_glb_lt.
+    apply a. apply (Qlt_le_trans _ (x2*(1+(/x2)*Qabs q))).
+    field_simplify. apply (Qle_lt_trans q (0+Qabs q)).
+    rewrite Qplus_0_l. apply Qle_Qabs. apply Qplus_lt_l. apply a.
+    destruct a. intro abs. rewrite abs in H1. exact (Qlt_irrefl 0 H1).
+    apply Qmult_le_compat_l. apply Q.le_max_r.
+    apply Qlt_le_weak. apply a. apply a0.
+    apply (Qlt_le_trans _ (x3*x0)).
+    apply (Qlt_trans _ (x3*x1)). apply a0.
+    apply Qmult_lt_l. apply (Qlt_trans 0 1). reflexivity. apply a0.
+    apply (lower_below_upper x). apply H0. exact u.
+    apply Qmult_le_l. apply (Qlt_trans 0 1). reflexivity. apply a0.
+    apply Q.le_max_l.
 Qed.
 
 Lemma Rmult_1_r (x : R) : (x * 1 == x)%R.
@@ -737,15 +828,277 @@ Qed.
 
 (* Distributivity *)
 
-Lemma Qmult_plus_distr_r (x y z : R) : (x * (y + z) == (x * y) + (x * z))%R.
+Lemma Ropp_mult_distr_l : forall r1 r2, (- (r1 * r2) == - r1 * r2)%R.
 Proof.
-  todo.
-Defined.
+  split.
+  - intros q [a [b [c [d H]]]]. simpl. 
+    exists (-b)%Q, (-a)%Q, c, d. repeat split.
+    simpl. rewrite Qopp_involutive. apply H.
+    simpl. rewrite Qopp_involutive. apply H.
+    apply H. apply H.
+    setoid_replace (-b*c) with (-(b*c)). 2: ring.
+    setoid_replace (-b*d) with (-(b*d)). 2: ring.
+    setoid_replace (-a*c) with (-(a*c)). 2: ring.
+    setoid_replace (-a*d) with (-(a*d)). 2: ring.
+    rewrite Qmin4_opp.
+    rewrite <- (Qplus_lt_l _ _ (-q+Qmax4 (b * c) (b * d) (a * c) (a * d))).
+    ring_simplify. unfold Qmax4. rewrite Q.max_comm.
+    setoid_replace (-1 * q) with (-q). apply H. ring.
+  - intros q [a [b [c [d H]]]]. simpl. simpl in H.
+    exists (-b)%Q, (-a)%Q, c, d. repeat split.
+    apply H. apply H. apply H. apply H.
+    setoid_replace (-b*c) with (-(b*c)). 2: ring.
+    setoid_replace (-b*d) with (-(b*d)). 2: ring.
+    setoid_replace (-a*c) with (-(a*c)). 2: ring.
+    setoid_replace (-a*d) with (-(a*d)). 2: ring.
+    rewrite Qmax4_opp.
+    rewrite <- (Qplus_lt_l _ _ (q+Qmin4 (b * c) (b * d) (a * c) (a * d))).
+    ring_simplify. unfold Qmin4. rewrite Q.min_comm. apply H.
+Qed.
 
-Lemma Qmult_plus_distr_l (x y z : R) : ((x + y) * z == (x * z) + (y * z))%R.
+Lemma Ropp_mult_distr_r : forall r1 r2, (- (r1 * r2) == r1 * -r2)%R.
 Proof.
-  todo.
-Defined.
+  intros. rewrite (Rmult_comm r1), (Rmult_comm r1).
+  apply Ropp_mult_distr_l.
+Qed.
+
+Lemma Qmul_min_distr_l: forall n m p : Q,
+    Qle 0 p -> (Qmin (p * n) (p * m) == (p * Qmin n m))%Q.
+Proof.
+  intros. destruct (Qlt_le_dec n m).
+  rewrite Q.min_l. rewrite Q.min_l. reflexivity.
+  apply Qlt_le_weak. exact q. apply Qmult_le_compat_l.
+  apply Qlt_le_weak. exact q. exact H.
+  rewrite Q.min_r. rewrite Q.min_r. reflexivity.
+  exact q. apply Qmult_le_compat_l.
+  exact q. exact H. 
+Qed.
+
+Lemma Rmult_plus_distr_r_le : forall (x y z : R), ((x * y) + (x * z) <= x * (y + z))%R.
+Proof.
+  intros x y z q [r [s [H [H0 H1]]]]. 
+  destruct H0,H0,H0,H0,H0,H2,H3,H4.
+  destruct H1,H1,H1,H1,H1,H6,H7,H8.
+  pose (Qmax x0 x4) as a. pose (Qmin x1 x5) as b.
+  exists a, b, (x2+x6), (x3+x7). repeat split.
+  unfold a. apply Q.max_case.
+  intros. apply (lower_proper x y0 x8). symmetry. exact H10. exact H11.
+  apply H0. apply H1.
+  apply Q.min_case.
+  intros. apply (upper_proper x y0 x8). symmetry. exact H10. exact H11.
+  exact H2. apply H6.
+  apply sum_interval_lower; assumption.
+  apply sum_interval_upper; assumption.
+  apply (Qlt_le_trans _ (r+s) _ H). clear H. clear q.
+  assert (r < Qmin4 (a*x2) (a*x3) (b*x2) (b*x3)).
+  { apply (Qlt_le_trans _ _ _ H5). apply mult_improve_both_bounds.
+    apply Q.min_glb_lt. apply Q.max_lub_lt.
+    apply (lower_below_upper x); assumption.
+    apply (lower_below_upper x); assumption.
+    apply Q.max_lub_lt.
+    apply (lower_below_upper x); assumption.
+    apply (lower_below_upper x); assumption.
+    apply (lower_below_upper y); assumption.
+    apply Q.le_max_l. apply Q.le_min_l. }
+  clear H5.
+  assert (s < Qmin4 (a*x6) (a*x7) (b*x6) (b*x7)).
+  { apply (Qlt_le_trans _ _ _ H9). apply mult_improve_both_bounds.
+    apply Q.min_glb_lt. apply Q.max_lub_lt.
+    apply (lower_below_upper x); assumption.
+    apply (lower_below_upper x); assumption.
+    apply Q.max_lub_lt.
+    apply (lower_below_upper x); assumption.
+    apply (lower_below_upper x); assumption.
+    apply (lower_below_upper z); assumption.
+    apply Q.le_max_r. apply Q.le_min_r. }
+  clear H9.
+  do 4 rewrite Qmult_plus_distr_r.
+  apply (Qle_trans _ (Qmin4 (a * x2) (a * x3) (b * x2) (b * x3)
+                      + Qmin4 (a * x6) (a * x7) (b * x6) (b * x7))).
+  apply Qplus_le_compat; apply Qlt_le_weak; assumption.
+  apply Q.min_glb_iff. split.
+  apply Q.min_glb_iff. split.
+  apply Qplus_le_compat. apply (Qle_trans _ (Qmin (a * x2) (a * x3))).
+  apply Q.le_min_l. apply Q.le_min_l.
+  apply (Qle_trans _ (Qmin (a * x6) (a * x7))).
+  apply Q.le_min_l. apply Q.le_min_l.
+  apply Qplus_le_compat. apply (Qle_trans _ (Qmin (a * x2) (a * x3))).
+  apply Q.le_min_l. apply Q.le_min_r.
+  apply (Qle_trans _ (Qmin (a * x6) (a * x7))).
+  apply Q.le_min_l. apply Q.le_min_r.
+  apply Q.min_glb_iff. split.
+  apply Qplus_le_compat. apply (Qle_trans _ (Qmin (b * x2) (b * x3))).
+  apply Q.le_min_r. apply Q.le_min_l.
+  apply (Qle_trans _ (Qmin (b * x6) (b * x7))).
+  apply Q.le_min_r. apply Q.le_min_l.
+  apply Qplus_le_compat. apply (Qle_trans _ (Qmin (b * x2) (b * x3))).
+  apply Q.le_min_r. apply Q.le_min_r.
+  apply (Qle_trans _ (Qmin (b * x6) (b * x7))).
+  apply Q.le_min_r. apply Q.le_min_r.
+Qed.
+
+Lemma Rmult_plus_distr_r (x y z : R) : (x * (y + z) == (x * y) + (x * z))%R.
+Proof.
+  split. 2: apply Rmult_plus_distr_r_le. 
+  pose proof (Rmult_plus_distr_r_le x (y+z)%R (-z)%R).
+  setoid_replace (y + z - z)%R with y in H. 
+  apply (Rplus_le_compat_r (x*z)%R) in H.
+  setoid_replace (x * (y + z) + x * - z + x * z)%R
+    with (x * (y+z))%R in H. exact H.
+  rewrite <- Ropp_mult_distr_r, Rplus_assoc, Rplus_opp_l, Rplus_0_r.
+  reflexivity. unfold Rminus.
+  rewrite Rplus_assoc, Rplus_opp_r, Rplus_0_r. reflexivity.
+Qed.
+
+Lemma Rmult_plus_distr_l (x y z : R) : ((x + y) * z == (x * z) + (y * z))%R.
+Proof.
+  intros. rewrite Rmult_comm, (Rmult_comm x), (Rmult_comm y).
+  apply Rmult_plus_distr_r.
+Qed.
+
+(* Associativity *)
+
+Definition split_pos (x : R) :
+  { ab : R*R | (x == fst ab - snd ab)%R /\ Rlt 0 (fst ab) /\ Rlt 0 (snd ab) }.
+Proof.
+  destruct (upper_bound x) as [q qmaj].
+  exists (pair (1+Qabs q)%R (1+Qabs q - x)%R).
+  simpl. split. unfold Rminus.
+  rewrite Ropp_plus_distr, Ropp_involutive, <- Rplus_assoc, Rplus_opp_r, Rplus_0_l. 
+  reflexivity.
+  split. exists (1#2). split. reflexivity. simpl.
+  exists (3#4), (-1#5). repeat split.
+  apply (Qlt_le_trans _ 0). reflexivity. apply Qabs_nonneg.
+  unfold Rminus. apply (Rplus_lt_reg_r x).
+  rewrite Rplus_0_l, Rplus_assoc, Rplus_opp_l, Rplus_0_r.
+  exists q. split. exact qmaj.
+  exists (1#2), (Qabs q - (1#4)). split. 
+  apply (Qle_lt_trans _ (Qabs q)). apply Qle_Qabs.
+  apply (Qplus_lt_l _ _ (-Qabs q)). ring_simplify. reflexivity.
+  split. reflexivity. simpl. unfold Qminus.
+  rewrite <- (Qplus_0_r (Qabs q)), <- Qplus_assoc, Qplus_lt_r. reflexivity.
+Qed.
+
+Lemma mult_lower_pos : forall x y : R,
+    Rlt 0 x
+    -> Rlt 0 y
+    -> (forall q:Q, mult_lower x y q
+                    <-> exists r s :Q, Qlt 0 r /\ Qlt 0 s /\ lower x r /\ lower y s
+                                       /\ q < r*s).
+Proof.
+  split.
+  - intros [a [b [c [d H1]]]]. 
+    destruct H,H0. exists (Qmax a x0), (Qmax c x1).
+    split. apply (Qlt_le_trans _ x0). apply H. apply Q.le_max_r.
+    split. apply (Qlt_le_trans _ x1). apply H0. apply Q.le_max_r.
+    split. apply Q.max_case. intros. apply (lower_proper x x2).
+    exact H2. exact H3. apply H1. apply H.
+    split. apply Q.max_case. intros. apply (lower_proper y x2).
+    exact H2. exact H3. apply H1. apply H0.
+    apply (Qlt_le_trans _ (Qmin4 (a * c) (a * d) (b * c) (b * d))).
+    apply H1. 
+    apply (Qle_trans _ (Qmin4 (Qmax a x0 * c) (Qmax a x0 * d) (b * c) (b * d))).
+    apply (mult_improve_left_bound a b c d (Qmax a x0)).
+    apply (lower_below_upper y). apply H1. apply H1.
+    apply (lower_below_upper x). apply Q.max_case. intros. apply (lower_proper x x2).
+    exact H2. exact H3. apply H1. apply H. apply H1.
+    apply Q.le_max_l. apply (Qle_trans _ (Qmax a x0 * c)).
+    apply (Qle_trans _ (Qmin (Qmax a x0 * c) (Qmax a x0 * d))).
+    apply Q.le_min_l. apply Q.le_min_l.
+    apply Qmult_le_l. apply (Qlt_le_trans _ x0). apply H. apply Q.le_max_r.
+    apply Q.le_max_l.
+  - intros [r [s H1]]. destruct (upper_bound x), (upper_bound y).
+    assert (r*s <= r*x1).
+    { apply Qmult_le_l. apply H1.
+      apply Qlt_le_weak, (lower_below_upper y). apply H1. exact u0. }
+    exists r,x0,s,x1. repeat split. apply H1. exact u. apply H1. exact u0.
+    apply (Qlt_le_trans _ (r*s)). apply H1.
+    unfold Qmin4. rewrite Q.min_l. rewrite Q.min_l. apply Qle_refl.
+    apply H2. apply (Qle_trans _ (r*s)). apply Q.le_min_l.
+    apply Q.min_glb_iff. split.
+    apply Qmult_le_r. apply H1.
+    apply Qlt_le_weak, (lower_below_upper x). apply H1. exact u.
+    apply (Qle_trans _ _ _ H2). apply Qmult_le_r.
+    apply (Qlt_trans 0 s). apply H1. 
+    apply (lower_below_upper y). apply H1. exact u0.
+    apply Qlt_le_weak, (lower_below_upper x). apply H1. exact u.
+Qed.
+
+Lemma Rmult_lt_0_compat : forall r1 r2:R, (0 < r1 -> 0 < r2 -> 0 < r1 * r2)%R.
+Proof.
+  intros. destruct H,H0. exists (x*x0). split.
+  simpl. rewrite <- (Qmult_0_l x0). apply Qmult_lt_r.
+  apply H0. apply H. apply mult_lower_pos.
+  exists x. exact H. exists x0. exact H0.
+  destruct (lower_open r1 x). apply H.
+  exists x1, x0. repeat split. apply (Qlt_trans _ x). apply H. apply H1.
+  apply H0. apply H1. apply H0.
+  apply Qmult_lt_r. apply H0. apply H1.
+Qed.
+
+Lemma Rmult_assoc_pos : forall (x y z : R),
+    Rlt 0 x
+    -> Rlt 0 y
+    -> Rlt 0 z
+    -> ((x * y) * z == x * (y * z))%R.
+Proof.
+  split.
+  - intros q H2. apply mult_lower_pos in H2.
+    3: exact H1. 2: exact (Rmult_lt_0_compat x y H H0).
+    destruct H2 as [r [s [H2 [H3 [H4 H5]]]]].
+    apply (mult_lower_pos x y H H0) in H4.
+    destruct H4,H4. 
+    apply mult_lower_pos. exact H. exact (Rmult_lt_0_compat y z H0 H1).
+    exists x0, (x1*s). repeat split.
+    apply H4. rewrite <- (Qmult_0_l s).
+    apply Qmult_lt_r. exact H3. apply H4. apply H4.
+    apply mult_lower_pos. exact H0. exact H1.
+    destruct (lower_open y x1). apply H4.
+    exists x2,s. repeat split. apply (Qlt_trans _ x1). apply H4. apply H6.
+    exact H3. apply H6. apply H5. apply Qmult_lt_r. exact H3. apply H6.
+    apply (Qlt_trans _ (r*s)). apply H5.
+    apply (Qlt_le_trans _ ((x0*x1)*s)).
+    apply Qmult_lt_r. exact H3. apply H4. rewrite Qmult_assoc. apply Qle_refl.
+  - intros q H2. apply mult_lower_pos in H2.
+    2: exact H. 2: exact (Rmult_lt_0_compat y z H0 H1).
+    destruct H2 as [r [s [H2 [H3 [H4 [H5 H6]]]]]].
+    apply (mult_lower_pos y z H0 H1) in H5.
+    destruct H5,H5. 
+    apply mult_lower_pos. 2: exact H1. exact (Rmult_lt_0_compat x y H H0).
+    exists (r*x0), x1. repeat split.
+    2: apply H5. rewrite <- (Qmult_0_l x0).
+    apply Qmult_lt_r. apply H5. exact H2.
+    apply mult_lower_pos. exact H. exact H0.
+    destruct (lower_open y x0). apply H5.
+    exists r,x2. repeat split. exact H2. apply (Qlt_trans _ x0).
+    apply H5. apply H7.
+    exact H4. apply H7. apply Qmult_lt_l. exact H2. apply H7.
+    apply H5.
+    apply (Qlt_trans _ (r*s)). apply H6.
+    rewrite <- Qmult_assoc. apply Qmult_lt_l. exact H2. apply H5.
+Qed.
+
+Lemma Rmult_assoc (x y z : R) : ((x * y) * z == x * (y * z))%R.
+Proof.
+  destruct (split_pos x), (split_pos y), (split_pos z), x0, x1, x2.
+  simpl in a,a0,a1. destruct a,a0,a1,H0,H2,H4. rewrite H,H1,H3.
+  unfold Rminus. repeat rewrite Rmult_plus_distr_l.
+  repeat rewrite Rmult_plus_distr_r.
+  repeat rewrite Rmult_plus_distr_l.
+  repeat rewrite <- Ropp_mult_distr_l.
+  repeat rewrite <- Ropp_mult_distr_r.
+  repeat rewrite <- Ropp_mult_distr_l.
+  repeat rewrite Rmult_assoc_pos; try assumption.
+  repeat rewrite Ropp_involutive.
+  apply Rplus_comp. do 2 rewrite Rplus_assoc.
+  apply Rplus_comp. reflexivity.
+  do 2 rewrite <- Rplus_assoc. apply Rplus_comp. 2: reflexivity.
+  rewrite Rplus_comm. reflexivity.
+  do 2 rewrite Rplus_assoc.
+  apply Rplus_comp. reflexivity.
+  do 2 rewrite <- Rplus_assoc. apply Rplus_comp. 2: reflexivity.
+  rewrite Rplus_comm. reflexivity.
+Qed.
 
 (* Inverse. *)
 
