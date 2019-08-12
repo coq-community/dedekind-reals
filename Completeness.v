@@ -15,8 +15,8 @@ Structure RCut := {
   r_upper : R -> Prop;
   r_lower_proper : Proper (Req ==> iff) r_lower;
   r_upper_proper : Proper (Req ==> iff) r_upper;
-  r_lower_bound : {x : R | r_lower x};
-  r_upper_bound : {x : R | r_upper x};
+  r_lower_bound : exists x : R, r_lower x;
+  r_upper_bound : exists x : R, r_upper x;
   r_lower_lower : forall x y, x < y -> r_lower y -> r_lower x;
   r_lower_open : forall x, r_lower x -> exists y, x < y /\ r_lower y;
   r_upper_upper : forall x y, x < y -> r_upper x -> r_upper y;
