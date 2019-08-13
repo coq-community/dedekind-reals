@@ -25,8 +25,8 @@ Structure R := {
   lower_proper : Proper (Qeq ==> iff) lower;
   upper_proper : Proper (Qeq ==> iff) upper;
   (* The cuts are inhabited. *)
-  lower_bound : {q : Q | lower q};
-  upper_bound : {r : Q | upper r};
+  lower_bound : exists q : Q, lower q;
+  upper_bound : exists r : Q, upper r;
   (* The lower cut is a lower set. *)
   lower_lower : forall q r, q < r -> lower r -> lower q;
   (* The lower cut is open. *)
@@ -246,6 +246,24 @@ Qed.
 (** We declare that [R_of_Q] can be used automatically to coerce
     rational numbers to real numbers. *)
 Coercion R_of_Q : Q >-> R.
+
+Lemma R_is_Q_iff : forall (x:R) (q:Q),
+    x == q <-> (forall r:Q, (Qlt q r -> upper x r) /\ (Qlt r q -> lower x r)).
+Proof.
+  split.
+  - split.
+    + intro. apply Req_equiv in H. destruct H.
+      apply (H r). simpl. exact H0.
+    + intro. destruct H. apply (H1 r). simpl. exact H0.
+  - split.
+    + intros s H0. simpl. destruct (Qlt_le_dec s q). exact q0.
+      exfalso. 
+      destruct (lower_open x s H0). specialize (H x0) as [H _].
+      apply (disjoint x x0). split. apply H1. apply H.
+      apply (Qle_lt_trans q s _ q0). apply H1.
+    + intros s H0. simpl in H0. pose proof (H s) as [_ H1].
+      apply H1. exact H0.
+Qed.
 
 (** Definition of common constants. *)
 Definition Rzero : R := R_of_Q 0.

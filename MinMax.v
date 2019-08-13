@@ -20,8 +20,8 @@ Proof.
             upper := (fun q => upper x q \/ upper y q) |}.
   - intros ? ? E. rewrite E ; tauto.
   - intros ? ? E. rewrite E ; tauto.
-  - destruct (lower_bound x) as [q ?].
-    destruct (lower_bound y) as [r ?].
+  - destruct (lower_bound x) as [q qmaj].
+    destruct (lower_bound y) as [r rmaj].
     exists (Qmin q r).
     split.
     + destruct (Q.min_spec q r) as [[G H]|[G H]].
@@ -108,8 +108,8 @@ Proof.
   - destruct (lower_bound x) as [q ?].
     exists q.
     left ; assumption.
-  - destruct (upper_bound x) as [q ?].
-    destruct (upper_bound y) as [r ?].
+  - destruct (upper_bound x) as [q qmaj].
+    destruct (upper_bound y) as [r rmaj].
     exists (Qmax q r).
     split.
     + destruct (Q.max_spec q r) as [[G H]|[G H]].
