@@ -1,8 +1,9 @@
 A formalization of the Dedekind real numbers in Coq.
 
 The formalization started as a student project at the University of Ljubljana.
-At this point the formalization is unfinished (search for `todo` in the Coq
-files). We would be delighted by contributions that would bring the formalization
+At this point the formalization of the field of reals is finished.
+
+There are still several unfinished theorems concering the lattice-theoretic structure of the reals (search for `todo` in the Coq files). We would be delighted by contributions that would bring the formalization
 closer to completeion.
 
 #### Compilation instruction
