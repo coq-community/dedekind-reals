@@ -1,0 +1,14 @@
+-R . DedekindReals
+
+-arg -w -arg -deprecated-instance-without-locality
+
+Additive.v
+Archimedean.v
+Cauchy.v
+Completeness.v
+Cut.v
+DecOrder.v
+MinMax.v
+MiscLemmas.v
+Multiplication.v
+Order.v

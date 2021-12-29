@@ -1,9 +1,9 @@
 (** Various lemmas that seem to be missing from the standard library. *)
 
-Require Import QArith Qminmax Qabs.
+Require Import QArith Qminmax Qabs Lia.
 
 Definition compose {A B C} (g : B -> C) (f : A -> B) := fun x => g (f x).
-Hint Unfold compose.
+Hint Unfold compose : core.
 Notation "g 'o' f" := (compose g f) (at level 40, left associativity).
 
 Definition const A B (y : B) : A -> B := (fun x => y).
@@ -31,7 +31,7 @@ Lemma Qopp_lt_compat : forall (p q : Q), p < q <-> -q < -p.
 Proof.
   intros [a b] [c d].
   unfold Qlt. simpl.
-  rewrite !Z.mul_opp_l. omega.
+  rewrite !Z.mul_opp_l. lia.
 Defined.
 
 Lemma Qplus_lt_lt_compat : forall (p q r s : Q), p < q -> r < s -> p + r < q + s.
