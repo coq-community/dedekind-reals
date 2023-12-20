@@ -1,7 +1,12 @@
 *.glob
 *.vo
 *.v.d
-/.coqdeps.d
-/Makefile.coq
-/Makefile.coq.conf
-/html
+*.vos
+*.vok
+*.aux
+.coqdeps.d
+.Makefile.coq.d
+.coq-native
+Makefile.coq
+Makefile.coq.conf
+html

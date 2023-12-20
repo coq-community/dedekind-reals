@@ -4,7 +4,7 @@ The formalization started as a student project at the University of Ljubljana.
 At this point the formalization of the field of reals is finished.
 
 There are still several unfinished theorems concering the lattice-theoretic structure of the reals (search for `todo` in the Coq files). We would be delighted by contributions that would bring the formalization
-closer to completeion.
+closer to completion.
 
 #### Compilation instruction
 
@@ -14,7 +14,7 @@ A fairly recent version of Coq should do. Run `make` to compile the files:
 * `make all` -- to make all that is to be made
 * `make clean` -- to remove the compiled files
 * `make html` -- to make the HTML documentation
-* `make install` -- we have never tried to run this
+* `make install` -- installs files as the library `DedekindReals`
 
 #### Structure of the modules
 
