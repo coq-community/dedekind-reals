@@ -33,7 +33,7 @@ Proof.
   apply Qabs_triangle. rewrite Qabs_opp. apply Qplus_lt_le_compat.
   - apply H. apply H0.
   - apply Qlt_le_weak. apply H. apply H1.
-Qed. 
+Qed.
 
 Definition CauchyQ_lower (un : nat -> Q) (q : Q) : Prop
   := exists (r:Q) (n:nat), Qlt 0 r /\ forall i:nat, le n i -> Qlt (q+r) (un i).
@@ -46,14 +46,14 @@ Lemma CauchyQ_lower_open
 Proof.
   intros. destruct H as [r [n H]].
   exists (q+r/2). split.
-  rewrite <- Qplus_0_r, <- Qplus_assoc, Qplus_lt_r, Qplus_0_l. 
+  rewrite <- Qplus_0_r, <- Qplus_assoc, Qplus_lt_r, Qplus_0_l.
   rewrite <- (Qmult_0_l (/2)). apply Qmult_lt_r.
   reflexivity. apply H.
-  exists (r/2), n. split. 
+  exists (r/2), n. split.
   rewrite <- (Qmult_0_l (/2)). apply Qmult_lt_r.
   reflexivity. apply H.
   intros. rewrite <- Qplus_assoc.
-  setoid_replace (r/2+r/2) with r. apply H. exact H0. field. 
+  setoid_replace (r/2+r/2) with r. apply H. exact H0. field.
 Qed.
 
 Lemma CauchyQ_upper_open
@@ -65,11 +65,11 @@ Proof.
   rewrite <- (Qplus_0_r q), <- Qplus_assoc, <- (Qplus_lt_r _ _ (-q+r/2)).
   ring_simplify. rewrite <- (Qmult_0_l (/2)). apply Qmult_lt_r.
   reflexivity. apply H.
-  exists (r/2), n. split. 
+  exists (r/2), n. split.
   rewrite <- (Qmult_0_l (/2)). apply Qmult_lt_r.
   reflexivity. apply H.
   intros. unfold Qminus. rewrite <- Qplus_assoc.
-  setoid_replace (-(r/2)+ -(r/2)) with (-r)%Q. apply H. exact H0. field. 
+  setoid_replace (-(r/2)+ -(r/2)) with (-r)%Q. apply H. exact H0. field.
 Qed.
 
 Lemma CauchyQ_located :
@@ -79,30 +79,30 @@ Proof.
   intros un q r cau H. assert (Qlt 0 ((r-q)/4)).
   { unfold Qdiv. rewrite <- (Qmult_0_l (/4)).
     apply Qmult_lt_r. reflexivity.
-    unfold Qminus. rewrite <- Qlt_minus_iff. exact H. } 
+    unfold Qminus. rewrite <- Qlt_minus_iff. exact H. }
   destruct (cau ((r-q)/4) H0) as [n nmaj].
   destruct (Qlt_le_dec (un n) ((q+r)/2)).
   - right. exists ((r-q)/4), n. split. exact H0. intros.
-    specialize (nmaj n i (le_refl _) H1).
+    specialize (nmaj n i (Nat.le_refl _) H1).
     rewrite <- (Qplus_lt_r _ _ (un n + - un i)). ring_simplify.
     apply (Qlt_le_trans _ ((q+r)/2) _ q0).
     rewrite <- (Qplus_le_r _ _ ((r-q)/4+-r)). ring_simplify.
     setoid_replace (un n + -1 * un i) with (un n - un i). 2: ring.
     apply Qlt_le_weak, Qabs_Qle_condition in nmaj.
     apply (Qle_trans _ (-((r-q)/4))). 2: apply nmaj.
-    apply Qle_minus_iff. 
+    apply Qle_minus_iff.
     setoid_replace (- ((r - q) / 4) + - ((r - q) / 4 + -1 * r + (q + r) / 2))
       with 0.
     2: field. apply Qle_refl.
   - left. exists ((r-q)/4), n. split. exact H0. intros.
-    specialize (nmaj n i (le_refl _) H1).
+    specialize (nmaj n i (Nat.le_refl _) H1).
     rewrite <- (Qplus_lt_r _ _ (un n + - un i)). ring_simplify.
     apply (Qlt_le_trans _ ((q+r)/2)). 2: exact q0. clear q0.
     rewrite <- (Qplus_lt_r _ _ (-q-(r-q)/4)). ring_simplify.
     setoid_replace (un n + -1 * un i) with (un n - un i). 2: ring.
     apply (Qle_lt_trans _ (Qabs (un n - un i))). apply Qle_Qabs.
     apply (Qlt_le_trans _ ((r-q)/4) _ nmaj).
-    apply Qle_minus_iff. 
+    apply Qle_minus_iff.
     setoid_replace (-1 * q + -1 * ((r - q) / 4) + (q + r) / 2 + - ((r - q) / 4))
       with 0.
     2: field. apply Qle_refl.
@@ -121,14 +121,14 @@ Proof.
     exists r, n. split. apply H0. intros. rewrite H. apply H0. exact H1.
   - destruct (cau 1) as [n nmaj]. reflexivity.
     exists (un n - 2), 1, n.
-    split. reflexivity. intros. specialize (nmaj n i (le_refl _) H).
+    split. reflexivity. intros. specialize (nmaj n i (Nat.le_refl _) H).
     rewrite <- (Qplus_lt_l _ _ (1-un i)). ring_simplify.
     apply (Qle_lt_trans _ (Qabs (un n - un i))). 2: exact nmaj.
     setoid_replace (un n + -1 * un i) with (un n - un i). 2: ring.
     apply Qle_Qabs.
   - destruct (cau 1) as [n nmaj]. reflexivity.
     exists (un n + 2), 1, n.
-    split. reflexivity. intros. specialize (nmaj n i (le_refl _) H).
+    split. reflexivity. intros. specialize (nmaj n i (Nat.le_refl _) H).
     rewrite Qabs_Qminus in nmaj.
     rewrite <- (Qplus_lt_l _ _ (-un n)). ring_simplify.
     apply (Qle_lt_trans _ (Qabs (un i - un n))). 2: exact nmaj.
@@ -141,7 +141,7 @@ Proof.
   - intros. destruct H0 as [s [n [H0 H1]]].
     exists s, n. split. exact H0. intros.
     apply (Qlt_trans _ (q-s) _ (H1 i H2)).
-    unfold Qminus. rewrite Qplus_lt_l. exact H. 
+    unfold Qminus. rewrite Qplus_lt_l. exact H.
   - apply CauchyQ_upper_open.
   - intros q [[r [n H]] [s [m H0]]]. destruct H, H0.
     specialize (H1 (max n m) (Nat.le_max_l _ _)).
@@ -209,8 +209,8 @@ Lemma pos_sum_more : forall (u : nat -> Q)
     -> le n p -> Qle (sum_f_Q0 u n) (sum_f_Q0 u p).
 Proof.
   intros. destruct (Nat.le_exists_sub n p H0). destruct H1. subst p.
-  rewrite plus_comm.
-  destruct x. rewrite plus_0_r. apply Qle_refl. rewrite Nat.add_succ_r.
+  rewrite Nat.add_comm.
+  destruct x. rewrite Nat.add_0_r. apply Qle_refl. rewrite Nat.add_succ_r.
   replace (S (n + x)) with (S n + x)%nat. rewrite <- Qplus_0_r.
   rewrite sum_assoc. rewrite Qplus_le_r.
   apply cond_pos_sum. intros. apply H. auto.
@@ -267,11 +267,11 @@ Proof.
     2: ring. ring_simplify. rewrite Qplus_0_l.
     apply (Qle_trans _ (sum_f_Q0 (fun k0 : nat => Qabs (un (S n + k0)%nat)) k)).
     apply multiTriangleIneg. apply sum_Qle. intros.
-    apply H. simpl. rewrite plus_comm. reflexivity.
-    assumption. assumption.  
+    apply H. simpl. rewrite Nat.add_comm. reflexivity.
+    assumption. assumption.
   - destruct (Nat.le_exists_sub p n) as [k [maj _]]. unfold lt in l.
-    apply (le_trans p (S p)). apply le_S. apply le_refl. assumption.
-    subst n. rewrite max_l. rewrite min_r. 
+    apply (Nat.le_trans p (S p)). apply le_S. apply Nat.le_refl. assumption.
+    subst n. rewrite max_l. rewrite min_r.
     destruct k. simpl plus. unfold Qminus. rewrite Qplus_opp_r.
     rewrite Qplus_opp_r. rewrite Qabs_pos. apply Qle_refl. apply Qle_refl.
     replace (S k + p)%nat with (S p + k)%nat.
@@ -281,9 +281,9 @@ Proof.
     2: ring.
     apply (Qle_trans _ (sum_f_Q0 (fun k0 : nat => Qabs (un (S p + k0)%nat)) k)).
     apply multiTriangleIneg. apply sum_Qle. intros.
-    apply H. simpl. rewrite plus_comm. reflexivity.
-    apply (le_trans p (S p)). apply le_S. apply le_refl. assumption.
-    apply (le_trans p (S p)). apply le_S. apply le_refl. assumption.
+    apply H. simpl. rewrite Nat.add_comm. reflexivity.
+    apply (Nat.le_trans p (S p)). apply le_S. apply Nat.le_refl. assumption.
+    apply (Nat.le_trans p (S p)). apply le_S. apply Nat.le_refl. assumption.
 Qed.
 
 (* The constructive analog of the least upper bound principle. *)
@@ -298,13 +298,13 @@ Proof.
   apply Abs_sum_maj. apply H.
   setoid_replace (sum_f_Q0 vn (max i j) - sum_f_Q0 vn (min i j))%Q
     with (Qabs (sum_f_Q0 vn (max i j) - (sum_f_Q0 vn (min i j)))).
-  apply nmaj. apply (le_trans _ i). assumption. apply Nat.le_max_l.
-  apply Nat.min_case. apply (le_trans _ i). assumption. apply le_refl.
+  apply nmaj. apply (Nat.le_trans _ i). assumption. apply Nat.le_max_l.
+  apply Nat.min_case. apply (Nat.le_trans _ i). assumption. apply Nat.le_refl.
   exact H2. rewrite Qabs_pos. reflexivity.
   apply (Qplus_le_l _ _ (sum_f_Q0 vn (Init.Nat.min i j))).
   ring_simplify. apply pos_sum_more.
   intros. apply (Qle_trans _ (Qabs (un k))). apply Qabs_nonneg.
-  apply H. apply (le_trans _ i). apply Nat.le_min_l. apply Nat.le_max_l.
+  apply H. apply (Nat.le_trans _ i). apply Nat.le_min_l. apply Nat.le_max_l.
 Qed.
 
 Lemma GeoHalfSum : forall k:nat,

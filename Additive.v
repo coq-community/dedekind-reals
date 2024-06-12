@@ -43,7 +43,7 @@ Proof.
     transitivity r ; assumption.
   - intros q [r [s [H1 [H2 H3]]]].
     exists ((q + r + s) * (1#2)) ; split.
-    + apply (Qle_lt_trans q  ((q+q)*(1#2)) ((q + r + s) * (1 # 2))). 
+    + apply (Qle_lt_trans q  ((q+q)*(1#2)) ((q + r + s) * (1 # 2))).
       ring_simplify; apply Qle_refl.
       apply Qmult_lt_compat_r; [reflexivity | idtac].
        apply (Qplus_lt_r _ _ (-q)); ring_simplify; assumption.
@@ -51,15 +51,15 @@ Proof.
       setoid_replace (r+s) with ((r+s+r+s)*(1#2)).
       apply Qmult_lt_compat_r. reflexivity.
       destruct (Qplus_lt_l q (r+s) (r+s)) .
-      setoid_replace (q+r+s) with (q+(r+s)); [idtac | ring]. 
+      setoid_replace (q+r+s) with (q+(r+s)); [idtac | ring].
       setoid_replace (r+s+r+s) with (r+s+(r+s)); [auto | ring].
-      ring_simplify; ring. 
+      ring_simplify; ring.
   - intros q r Lqr [r' [s' [H1 [H2 H3]]]].
     exists r', s'; split; auto.
     transitivity q; assumption.
   - intros q [r [s [H1 [H2 H3]]]].
     exists ((q + r + s) * (1#2)) ; split.
-    +apply (Qlt_le_trans ((q + r + s) * (1 # 2)) ((q+q)*(1#2)) q). 
+    +apply (Qlt_le_trans ((q + r + s) * (1 # 2)) ((q+q)*(1#2)) q).
      apply Qmult_lt_compat_r; [reflexivity | idtac].
      destruct (Qplus_lt_r (r+s) q q).
      setoid_replace (q+r+s) with (q+(r+s)); [apply H0;assumption|idtac].
@@ -90,10 +90,10 @@ Proof.
         exists xL, yL; split; auto.
         assert (r-xL-yL<r-q).
           -setoid_replace (r-q) with ((r-q)*(1#2) + (r-q)*(1#2));[idtac|ring].
-           apply (Qlt_trans (r-xL-yL) ((r-q)*(1#2)+yU-yL) ((r-q)*(1#2)+(r-q)*(1#2))).    
+           apply (Qlt_trans (r-xL-yL) ((r-q)*(1#2)+yU-yL) ((r-q)*(1#2)+(r-q)*(1#2))).
            + apply (Qle_lt_trans (r-xL-yL) (xU-xL+yU-yL) ((r-q)*(1#2)+yU-yL)).
              * apply (Qplus_le_r _ _ (xL+yL)%Q) ; ring_simplify ; auto.
-             * apply (Qplus_lt_r _ _ (-yU+yL)%Q) ; ring_simplify. 
+             * apply (Qplus_lt_r _ _ (-yU+yL)%Q) ; ring_simplify.
                setoid_replace ((1 # 2) * r + (-1 # 2) * q) with ((r - q) * (1 # 2)).
                auto. ring_simplify; reflexivity.
            + setoid_replace ((r-q)*(1#2)+yU-yL) with ((r-q)*(1#2)+(yU-yL)).
@@ -102,9 +102,9 @@ Proof.
           -apply (Qplus_lt_l _ _ (r-xL-yL-q)); ring_simplify.
            setoid_replace ((-1#1)*q+r) with (r-q);[auto|apply (Qplus_comm ((-1#1)*q)r)].
         }
-    +left. 
+    +left.
      exists xL, yL; split; auto.
-     apply (Qlt_le_trans q r (xL+yL)); auto. 
+     apply (Qlt_le_trans q r (xL+yL)); auto.
 Defined.
 
 (** Opposite value. *)
@@ -122,8 +122,7 @@ Proof.
     rewrite (Qopp_involutive q); assumption.
   - intros q r H G.
     apply (upper_upper _ (- r) _); [idtac | assumption].
-    apply Qopp_lt_compat.
-    rewrite 2 Qopp_involutive; assumption.
+    now apply Qopp_lt_compat.
   - intros q H.
     destruct (upper_open x (-q)) as [s [G1 G2]]; [assumption | idtac].
     exists (-s); split.
@@ -131,8 +130,7 @@ Proof.
     rewrite Qopp_involutive; assumption.
   - intros q r H G.
     apply (lower_lower _ _ (- q)) ; [idtac | assumption].
-    apply Qopp_lt_compat.
-    rewrite 2 Qopp_involutive; assumption.
+    now apply Qopp_lt_compat.
   - intros q H.
     destruct (lower_open x (-q)) as [s [G1 G2]]; [assumption | idtac].
     exists (-s); split.
@@ -143,7 +141,7 @@ Proof.
     tauto.
   - intros q r H.
     destruct (located x (-r) (-q)).
-    + apply Qopp_lt_compat; rewrite 2 Qopp_involutive; assumption.
+    + now apply Qopp_lt_compat.
     + right; assumption.
     + left; assumption.
 Defined.
@@ -213,14 +211,14 @@ Proof.
       apply Qplus_lt_l.
       assumption.
     + split ; auto.
-      destruct (lower_open z r) as [t [H1 H2]]. assumption. 
+      destruct (lower_open z r) as [t [H1 H2]]. assumption.
       exists r', t; split; auto.
       rewrite (Qplus_comm r r').
       apply Qplus_lt_r; auto.
   - intros q [x' [yz' [H [Hx [y' [z' [H1 [Hy Hz]]]]]]]].
     exists (x' + y')%Q, z' ; split.
     + transitivity (x' + yz')%Q ; auto.
-      apply (Qplus_lt_r _ _ (-x')); ring_simplify; assumption. 
+      apply (Qplus_lt_r _ _ (-x')); ring_simplify; assumption.
     + split ; auto.
       destruct (lower_open x x') as [t [G1 G2]] ; auto.
       exists t, y'; split; auto.
@@ -279,7 +277,7 @@ Proof.
      apply (lower_below_upper x); [assumption|auto].
   - assert (G : (-q > 0)%Q).
     + apply (Qplus_lt_r _ _ q) ; ring_simplify ; auto.
-    + destruct (archimedean x _ G) as [a [b [A [B C]]]]. 
+    + destruct (archimedean x _ G) as [a [b [A [B C]]]].
       exists a, (-b)%Q; repeat split; auto.
       apply (Qplus_lt_r _ _ (b-a-q)%Q) ; ring_simplify ; auto.
       cut (upper x (--b)) ; auto.
@@ -300,7 +298,7 @@ Proof.
     setoid_replace (-1*q) with (-q)%Q. apply H. ring.
     apply (upper_proper r1 r). ring. apply H.
     apply (upper_proper r2 s). ring. apply H.
-  - intros q [r [s H]]. exists (-r)%Q,(-s)%Q. 
+  - intros q [r [s H]]. exists (-r)%Q,(-s)%Q.
     repeat split. rewrite <- (Qplus_lt_l _ _ (r+s+q)). ring_simplify.
     apply H. apply H. apply H.
 Qed.

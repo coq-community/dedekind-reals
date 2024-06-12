@@ -1,7 +1,7 @@
 (** When doing classical analysis, discontinuous real functions are often
     defined by testing a comparison, like
     f x := if 0 < x then 1 else 0.
-    
+
     This requires the following disjunction in sort Type,
     { x < y } + { ~(x < y) }.
 
@@ -53,7 +53,7 @@ Qed.
 
 Lemma DecOrderImpliesLPO : (forall x:R, { 0 < x } + { ~(0 < x) }) -> LPO.
 Proof.
-  intros decOrder un. 
+  intros decOrder un.
   pose (fun n:nat => if un n then (/2)^(Z.of_nat n) else 0%Q) as vn.
   assert (CauchyQ (sum_f_Q0 vn)).
   { apply (Cauchy_series_maj _ (fun n:nat => (/2)^(Z.of_nat n))).
@@ -64,14 +64,14 @@ Proof.
   destruct (decOrder (CauchyQ_R (sum_f_Q0 vn) H)) as [H0|H0].
   - left. destruct H0 as [q [qPos H0]].
     destruct H0 as [r [n [rPos H0]]].
-    specialize (H0 n (le_refl _)). simpl in qPos.
+    specialize (H0 n (Nat.le_refl _)). simpl in qPos.
     apply (Qlt_trans 0 (q+r)) in H0. apply Find_positive_in_sum in H0.
     destruct H0. exists x. unfold vn in H0.
     destruct (un x) eqn:des. reflexivity.
     exfalso. exact (Qlt_irrefl 0 H0).
     intros. unfold vn. destruct (un k). apply Qpower_pos. discriminate.
     discriminate. rewrite <- Qplus_0_r. apply Qplus_lt_le_compat.
-    exact qPos. apply Qlt_le_weak. exact rPos. 
+    exact qPos. apply Qlt_le_weak. exact rPos.
   - right. intro n. apply Rnot_lt_le in H0.
     unfold Rle, CauchyQ_R in H0; simpl in H0.
     destruct (un n) eqn:des. 2: reflexivity. exfalso.
@@ -91,7 +91,7 @@ Proof.
     rewrite Qmult_inv_r. field_simplify. reflexivity.
     apply Qpower_nonzero. intro abs. discriminate.
     apply Qpower_nonzero. intro abs. discriminate.
-    apply Qpower_strictly_pos. reflexivity. 
+    apply Qpower_strictly_pos. reflexivity.
     rewrite Qpower_plus. simpl. rewrite Qinv_mult_distr. reflexivity.
     intro abs. discriminate.
     apply (Qle_trans _ (vn n)).

@@ -59,7 +59,7 @@ Proof.
   - intro n. apply located. apply Qplus_lt_r. apply Qmult_lt_r.
     apply Qinv_lt_0_compat. unfold Qlt. simpl. unfold Z.lt. auto.
     apply Qmult_lt_r. assumption. rewrite <- Zlt_Qlt.
-    apply inj_lt. apply le_refl.
+    apply inj_lt. apply Nat.le_refl.
   - simpl. rewrite Qmult_0_l. unfold Qdiv. rewrite Qmult_0_l.
     rewrite Qplus_0_r. assumption.
   - apply (uu r). exact u. rewrite <- Qplus_0_l. rewrite <- (Qplus_opp_r q).

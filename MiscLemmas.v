@@ -1,6 +1,9 @@
 (** Various lemmas that seem to be missing from the standard library. *)
 
 Require Import QArith Qminmax Qabs Lia.
+Require Import Qpower.
+
+Section MiscLemmas.
 
 Definition compose {A B C} (g : B -> C) (f : A -> B) := fun x => g (f x).
 Hint Unfold compose : core.
@@ -187,8 +190,6 @@ Proof.
     apply Qplus_le_l; assumption.
 Qed.
 
-Require Import Qpower.
-
 Lemma Qpower_zero: forall p, ~p == 0 -> p^0 == 1.
 Proof.
 intros p H.
@@ -304,3 +305,5 @@ Proof.
     + assumption.
     + apply (Qle_trans _ q) ; assumption.
 Qed.
+
+End MiscLemmas.

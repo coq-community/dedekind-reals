@@ -1,10 +1,13 @@
 A formalization of the Dedekind real numbers in Coq.
 
-The formalization started as a student project at the University of Ljubljana.
-At this point the formalization of the field of reals is finished.
+The formalization started as a student project at the University of Ljubljana,
+under the supervision of Andrej Bauer <Andrej.Bauer@andrej.com>, and was brought
+to the present state by Vincent Semeria <vincent.semeria@gmail.com>.
 
-There are still several unfinished theorems concering the lattice-theoretic structure of the reals (search for `todo` in the Coq files). We would be delighted by contributions that would bring the formalization
-closer to completion.
+At this point the formalization of the field of reals is finished. There are
+still several unfinished theorems concering the lattice-theoretic structure of
+the reals (search for `todo` in the Coq files). We would be delighted by
+contributions that would bring the formalization closer to completion.
 
 #### Compilation instruction
 
