@@ -1,0 +1,40 @@
+# This file was generated from `meta.yml`, please do not edit manually.
+# Follow the instructions on https://github.com/coq-community/templates to regenerate.
+
+opam-version: "2.0"
+maintainer: "palmskog@gmail.com"
+version: "dev"
+
+homepage: "https://github.com/coq-community/dedekind-reals"
+dev-repo: "git+https://github.com/coq-community/dedekind-reals.git"
+bug-reports: "https://github.com/coq-community/dedekind-reals/issues"
+license: "MIT"
+
+synopsis: "A formalization of the Dedekind real numbers in Coq"
+description: """
+A formalization of Dedekind reals numbers that started as a
+student project at the University of Ljubljana under the supervision
+of Andrej Bauer, and was brought to the present state by Vincent Semeria.
+
+At this point the formalization of the field of reals is finished.
+There are still several unfinished theorems concering the lattice-theoretic
+structure of the reals (search for `todo` in the Coq files). We would be
+delighted by contributions that would bring the formalization
+closer to completion."""
+
+build: [make "-j%{jobs}%"]
+install: [make "install"]
+depends: [
+  "coq" {>= "8.16"}
+]
+
+tags: [
+  "category:Mathematics/Real Calculus and Topology"
+  "keyword:real numbers"
+  "keyword:analysis"
+  "logpath:DedekindReals"
+]
+authors: [
+  "Andrej Bauer <Andrej.Bauer@andrej.com>"
+  "Vincent Semeria <vincent.semeria@gmail.com>"
+]

@@ -1,0 +1,81 @@
+---
+fullname: Dedekind Reals
+shortname: dedekind-reals
+organization: coq-community
+community: true
+action: true
+
+synopsis: A formalization of the Dedekind real numbers in Coq
+
+description: |-
+  A formalization of Dedekind reals numbers that started as a
+  student project at the University of Ljubljana under the supervision
+  of Andrej Bauer, and was brought to the present state by Vincent Semeria.
+
+  At this point the formalization of the field of reals is finished.
+  There are still several unfinished theorems concering the lattice-theoretic
+  structure of the reals (search for `todo` in the Coq files). We would be
+  delighted by contributions that would bring the formalization
+  closer to completion.
+
+authors:
+- name: Andrej Bauer
+  email: Andrej.Bauer@andrej.com
+- name: Vincent Semeria
+  email: vincent.semeria@gmail.com
+
+maintainers:
+- name: Andrej Bauer
+  nickname: andrejbauer
+
+opam-file-maintainer: palmskog@gmail.com
+
+opam-file-version: dev
+
+build: |-
+  ## Building instructions
+  
+  To build and install, do:
+  
+  ```shell
+  git clone https://github.com/coq-community/dedekind-reals.git
+  cd dedekind-reals
+  make   # or make -j <number-of-cores-on-your-machine> 
+  make install
+  ```
+
+license:
+  fullname: MIT License
+  identifier: MIT
+
+supported_coq_versions:
+  text: 8.16 and later
+  opam: '{>= "8.16"}'
+
+tested_coq_opam_versions:
+- version: 'dev'
+- version: '8.19'
+- version: '8.18'
+- version: '8.17'
+- version: '8.16'
+
+namespace: DedekindReals
+
+keywords:
+- name: real numbers
+- name: analysis
+
+categories:
+- name: Mathematics/Real Calculus and Topology
+
+documentation: |-
+  ## Structure of the modules
+  
+  - `MiscLemmas`: various lemmas about rational numbers
+  - `Cut`: definition of Dedekind cuts and several other basic notions
+  - `Additive`: Additive structure of the reals
+  - `Multiplication` : Multiplicative structure of the relas
+  - `Order` : The order on the reals
+  - `Archimedean`: the proof that the reals satisfy the archimedean property
+  - `Completeness`: the reals are Dedekind-complete
+---
