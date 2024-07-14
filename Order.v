@@ -18,7 +18,7 @@ Ltac todo := apply unfinished.
 Theorem Rlt_irrefl : forall (x : R), ~ (x < x).
 Proof.
   intros x [q [H1 H2]].
-  auto using (disjoint x q).
+  pose (disjoint x q); auto.
 Qed.
 
 Theorem Rlt_trans : forall (x y z : R), x < y -> y < z -> x < z.
@@ -60,7 +60,7 @@ Qed.
 
 Theorem Rneq_irrefl : forall x : R, x ## x -> False.
 Proof.
-  intros x [A1|A2]; auto using (Rlt_irrefl x).
+  intros x [A1|A2]; pose (Rlt_irrefl x); auto.
 Qed.
 
 Theorem Rnew_contrans : forall x y z : R, x ## y -> ((x ## z) \/ (y ## z)).
