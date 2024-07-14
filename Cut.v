@@ -172,7 +172,7 @@ Proof.
   destruct (Q_dec q r) as [[E1 | E2] | E3].
   - assumption.
   - exfalso. apply (disjoint x r).
-    auto using (lower_lower x r q).
+    pose (lower_lower x r q); auto.
   - exfalso. apply (disjoint x r).
     split; [idtac | assumption].
     rewrite <- E3; assumption.

@@ -26,9 +26,9 @@ Proof.
     split.
     + destruct (Q.min_spec q r) as [[G H]|[G H]].
       * setoid_rewrite H ; assumption.
-      * setoid_rewrite H. auto using (lower_le x r q).
+      * setoid_rewrite H. pose (lower_le x r q); auto.
     + destruct (Q.min_spec q r) as [[G H]|[G H]].
-      * setoid_rewrite H. auto using (lower_lower y q r).
+      * setoid_rewrite H. pose (lower_lower y q r); auto.
       * setoid_rewrite H ; assumption.
   - destruct (upper_bound y) as [r ?].
     exists r.
@@ -89,8 +89,8 @@ Proof.
     apply neg_false.
     split.
     + intros [[lx ly] [ux | uy]].
-      auto using (disjoint x q).
-      auto using (disjoint y q).
+      pose (disjoint x q); auto.
+      pose (disjoint y q); auto.
     + tauto.
   - intros q r T.
     assert (H:=(located x q r T)).
@@ -113,11 +113,11 @@ Proof.
     exists (Qmax q r).
     split.
     + destruct (Q.max_spec q r) as [[G H]|[G H]].
-      * setoid_rewrite H. auto using (upper_upper x q r).
+      * setoid_rewrite H. pose (upper_upper x q r); auto.
       * setoid_rewrite H ; assumption.
     + destruct (Q.max_spec q r) as [[G H]|[G H]].
       * setoid_rewrite H ; assumption.
-      * setoid_rewrite H. auto using (upper_le y r q).
+      * setoid_rewrite H. pose (upper_le y r q); auto.
   - intros q r H [A | B].
     + assert (C:=(lower_lower x q r H A)).
       left ; assumption.
@@ -153,17 +153,17 @@ Proof.
     + destruct (Q.max_spec s q) as [[G H]|[G H]].
       * setoid_rewrite H ; assumption.
       * setoid_rewrite H.
-        auto using (upper_le x q s U G).
+        pose (upper_le x q s U G); auto.
     + destruct (Q.max_spec s q) as [[G H]|[G H]].
       * setoid_rewrite H.
-        auto using (upper_upper y s q G P).
+        pose (upper_upper y s q G P); auto.
       * setoid_rewrite H ; assumption.
   - intro.
     apply neg_false.
     split.
     + intros [[lx | ly] [ux  uy]].
-      auto using (disjoint x q).
-      auto using (disjoint y q).
+      pose (disjoint x q); auto.
+      pose (disjoint y q); auto.
     + tauto.
   - intros q r T.
     assert (H:=(located x q r T)).
