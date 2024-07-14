@@ -1,11 +1,11 @@
 (** The inclusion of Cauchy reals into Dedekind reals,
     and the proof that Dedekind reals are Cauchy-complete. *)
 
-Require Import QArith.
-Require Import Qabs.
-Require Import Qpower.
-Require Import Cut.
-Require Import MiscLemmas.
+From Coq Require Import QArith.
+From Coq Require Import Qabs.
+From Coq Require Import Qpower.
+From DedekindReals Require Import Cut.
+From DedekindReals Require Import MiscLemmas.
 
 Definition CauchyQ (un : nat -> Q) : Set
   := forall eps:Q,

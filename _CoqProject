@@ -1,4 +1,4 @@
--R theories DedekindReals
+-Q theories DedekindReals
 
 -arg -w -arg -deprecated-instance-without-locality
 

@@ -1,10 +1,10 @@
 (* The lattice structure of the reals. *)
 
-Require Import Setoid Morphisms.
-Require Import QArith.
-Require Import Qminmax.
+From Coq Require Import Setoid Morphisms.
+From Coq Require Import QArith.
+From Coq Require Import Qminmax.
 
-Require Import Cut MiscLemmas Additive Multiplication Order.
+From DedekindReals Require Import Cut MiscLemmas Additive Multiplication Order.
 
 Local Open Scope R_scope.
 
