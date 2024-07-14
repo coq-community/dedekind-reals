@@ -7,9 +7,9 @@
    can find a straddling pair (u, l). In other words, this means we cna find arbitrarily
    good lower and upper rational approximations to x. *)
 
-Require Import QArith.
-Require Import MiscLemmas.
-Require Import Cut.
+From Coq Require Import QArith.
+From DedekindReals Require Import MiscLemmas.
+From DedekindReals Require Import Cut.
 
 Local Open Scope Q_scope.
 

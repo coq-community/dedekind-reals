@@ -1,10 +1,10 @@
 (** The additive structure of reals. *)
 
-Require Import Setoid Morphisms SetoidClass.
-Require Import MiscLemmas.
-Require Import QArith QOrderedType Qminmax Qabs.
-Require Import Cut.
-Require Import Archimedean.
+From Coq Require Import Setoid Morphisms SetoidClass.
+From DedekindReals Require Import MiscLemmas.
+From Coq Require Import QArith QOrderedType Qminmax Qabs.
+From DedekindReals Require Import Cut.
+From DedekindReals Require Import Archimedean.
 
 Local Open Scope Q_scope.
 

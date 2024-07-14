@@ -1,8 +1,8 @@
 (** The definition of Dedekind cuts. *)
 
-Require Import QArith QOrderedType.
-Require Import Morphisms SetoidClass.
-Require Import MiscLemmas.
+From Coq Require Import QArith QOrderedType.
+From Coq Require Import Morphisms SetoidClass.
+From DedekindReals Require Import MiscLemmas.
 
 (** In the definition below we use disjunction and existence where one might
     expect sums and disjoint sums, in particular in [lower_open], [upper_open],

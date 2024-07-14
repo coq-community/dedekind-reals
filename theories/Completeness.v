@@ -3,9 +3,9 @@
    get R back. 
 *)
 
-Require Import Morphisms.
-Require Import QArith.
-Require Import Cut Order.
+From Coq Require Import Morphisms.
+From Coq Require Import QArith.
+From DedekindReals Require Import Cut Order.
 
 Local Open Scope R_scope.
 

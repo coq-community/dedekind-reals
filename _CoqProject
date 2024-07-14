@@ -1,14 +1,14 @@
--R . DedekindReals
+-Q theories DedekindReals
 
 -arg -w -arg -deprecated-instance-without-locality
 
-Additive.v
-Archimedean.v
-Cauchy.v
-Completeness.v
-Cut.v
-DecOrder.v
-MinMax.v
-MiscLemmas.v
-Multiplication.v
-Order.v
+theories/Additive.v
+theories/Archimedean.v
+theories/Cauchy.v
+theories/Completeness.v
+theories/Cut.v
+theories/DecOrder.v
+theories/MinMax.v
+theories/MiscLemmas.v
+theories/Multiplication.v
+theories/Order.v

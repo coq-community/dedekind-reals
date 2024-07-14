@@ -12,15 +12,15 @@
     The series vn is convergent, because bounded by the convergent
     series 2^{-n}. *)
 
-Require Import Logic.ConstructiveEpsilon.
-Require Import QArith.
-Require Import Qabs.
-Require Import Qpower.
-Require Import Cut.
-Require Import Cauchy.
-Require Import Additive.
-Require Import MiscLemmas.
-Require Import Qminmax.
+From Coq Require Import ConstructiveEpsilon.
+From Coq Require Import QArith.
+From Coq Require Import Qabs.
+From Coq Require Import Qpower.
+From DedekindReals Require Import Cut.
+From DedekindReals Require Import Cauchy.
+From DedekindReals Require Import Additive.
+From DedekindReals Require Import MiscLemmas.
+From Coq Require Import Qminmax.
 
 Local Open Scope R_scope.
 

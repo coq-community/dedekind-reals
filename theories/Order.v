@@ -1,10 +1,10 @@
 (* The order relations < and <=. *)
 
-Require Import Morphisms Setoid.
-Require Import QArith.
-Require Import Cut.
-Require Import Additive Multiplication.
-Require Import Archimedean.
+From Coq Require Import Morphisms Setoid.
+From Coq Require Import QArith.
+From DedekindReals Require Import Cut.
+From DedekindReals Require Import Additive Multiplication.
+From DedekindReals Require Import Archimedean.
 
 Local Open Scope R_scope.
 
